@@ -24,7 +24,7 @@ export default function Home() {
         </div>
 
         {/* Roles Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 w-full mt-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 w-full mt-4">
            
            {/* Patient Portal Card */}
            <div className="glass-card p-8 flex flex-col items-start transition-all duration-300 hover:-translate-y-2 hover:shadow-indigo-500/10 group">
@@ -89,6 +89,22 @@ export default function Home() {
               <div className="flex flex-col gap-3 w-full mt-auto">
                  <Link href="/dashboard" className="w-full py-3 bg-orange-600 hover:bg-orange-500 text-white font-bold text-sm text-center rounded-xl transition shadow-[0_0_15px_rgba(249,115,22,0.3)]">
                     Live Surveillance
+                 </Link>
+              </div>
+           </div>
+
+           {/* New EMR Card */}
+           <div className="glass-card p-8 flex flex-col items-start transition-all duration-300 hover:-translate-y-2 hover:shadow-cyan-500/10 group">
+              <div className="w-14 h-14 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 flex items-center justify-center text-2xl mb-6 shadow-inner text-cyan-400 group-hover:scale-110 transition-transform">
+                 📝
+              </div>
+              <h2 className="text-2xl font-bold text-white mb-3 tracking-tight">EMR / EHR</h2>
+              <p className="text-zinc-400 text-sm mb-8 flex-grow leading-relaxed">
+                 Clinical Charting Interface. Doctors map prescriptions, symptoms, and diagnoses directly to the FHIR interoperability blockchain.
+              </p>
+              <div className="flex flex-col gap-3 w-full mt-auto">
+                 <Link href="/emr" className="w-full py-3 bg-cyan-600 hover:bg-cyan-500 text-white font-bold text-sm text-center rounded-xl transition shadow-[0_0_15px_rgba(6,182,212,0.3)]">
+                    Provider Terminal
                  </Link>
               </div>
            </div>

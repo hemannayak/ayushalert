@@ -348,14 +348,20 @@ export default function DoctorDashboard() {
                               <div>
                                  <div className="flex items-center gap-3">
                                    <p className="font-bold text-white text-lg">{record.document_type || 'Clinical Document'}</p>
-                                   <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${record.verified ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'}`}>
-                                      {record.verified ? 'Verified' : 'Unverified'}
-                                   </span>
+                                   {record.data_origin === 'emr' ? (
+                                      <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center gap-1">
+                                         🏥 Hospital Verified (EMR)
+                                      </span>
+                                   ) : (
+                                      <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${record.verified ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'} flex items-center gap-1`}>
+                                         🤖 AI Extracted (PHR)
+                                      </span>
+                                   )}
                                  </div>
-                                 <div className="flex flex-wrap gap-4 mt-2 text-xs font-mono text-zinc-500">
-                                     <span>TS: {new Date(record.uploaded_at).toLocaleDateString()}</span>
-                                     <span>ID: {record.record_id}</span>
-                                     <span className="text-indigo-400">SRC: {record.source.toUpperCase()}</span>
+                                 <div className="flex flex-wrap gap-4 mt-2 text-xs font-mono text-zinc-400">
+                                     <span>TS: <span className="text-zinc-200">{new Date(record.uploaded_at).toLocaleString()}</span></span>
+                                     <span>ID: <span className="text-zinc-200">{record.record_id}</span></span>
+                                     {record.doctor && <span className="text-indigo-400 flex items-center gap-1">👨‍⚕️ {record.doctor}</span>}
                                  </div>
                               </div>
                               <button onClick={() => setViewRecord(record)} className="bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 px-5 py-2.5 rounded-lg text-sm font-bold transition shadow-inner w-full sm:w-auto mt-3 sm:mt-0">
@@ -384,20 +390,33 @@ export default function DoctorDashboard() {
           <div className="bg-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden shadow-[0_0_50px_rgba(0,0,0,1)] w-full max-w-5xl max-h-[95vh] flex flex-col relative" onClick={e => e.stopPropagation()}>
             <div className="p-5 border-b border-zinc-800 bg-zinc-900/50 flex justify-between items-center relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-emerald-500"></div>
-              <div>
+               <div>
                  <h3 className="font-bold text-white text-lg flex items-center gap-2">
                     <span className="text-indigo-500">🔐</span> Secure Record Decryption: {viewRecord.document_type || 'Document'}
                  </h3>
                  <p className="text-zinc-500 text-xs font-mono mt-1">HASH: {viewRecord.record_id}</p>
               </div>
-              <button onClick={() => setViewRecord(null)} className="text-zinc-400 hover:text-white hover:bg-zinc-800 font-bold px-4 py-2 rounded-lg transition border border-zinc-800">Close Pipeline</button>
+              <div className="flex gap-3">
+                 {viewRecord.data_origin === 'emr' && (
+                    <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-cyan-900/30 border border-cyan-500/30 rounded-lg text-cyan-400 text-xs font-bold tracking-widest uppercase">
+                       🏥 EMR Source
+                    </div>
+                 )}
+                 <button onClick={() => setViewRecord(null)} className="text-zinc-400 hover:text-white hover:bg-zinc-800 font-bold px-4 py-2 rounded-lg transition border border-zinc-800">Close Pipeline</button>
+              </div>
             </div>
             
             <div className="flex flex-col md:flex-row flex-1 overflow-hidden h-[75vh]">
                {/* Image/Document Preview Side */}
                <div className="md:w-1/2 p-4 bg-black flex items-center justify-center overflow-auto border-r border-zinc-800 relative group">
                   <div className="text-zinc-700 absolute inset-0 flex items-center justify-center font-mono opacity-20 pointer-events-none select-none text-xl rotate-45">ENCRYPTED ORIGIN</div>
-                  {(() => {
+                  {viewRecord.data_origin === 'emr' ? (
+                     <div className="relative z-10 text-center space-y-4">
+                        <div className="w-24 h-24 bg-cyan-900/30 border border-cyan-500/30 rounded-full flex items-center justify-center mx-auto text-4xl shadow-[0_0_30px_rgba(6,182,212,0.2)]">🏥</div>
+                        <h4 className="text-cyan-400 font-bold text-lg">Hospital EMR Record</h4>
+                        <p className="text-zinc-400 text-sm max-w-xs mx-auto">This record was generated securely within an authorized hospital Electronic Medical Record system. No analog analog source document exists.</p>
+                     </div>
+                  ) : (() => {
                     const url = viewRecord.file_url || '';
                     const lowerUrl = url.toLowerCase();
                     if (lowerUrl.includes('.docx') || lowerUrl.includes('.doc')) {
@@ -436,9 +455,11 @@ export default function DoctorDashboard() {
                   )}
 
                   <div className="mt-8 pt-4 border-t border-zinc-800 text-xs text-zinc-500 font-mono space-y-1">
+                     <p>Created At: <span className="text-zinc-200">{new Date(viewRecord.uploaded_at).toLocaleString()}</span></p>
                      <p>Neural Confidence: <span className="text-white">{viewRecord.confidence_score}%</span></p>
-                     <p>Source Node: <span className="text-white">{viewRecord.source.toUpperCase()}</span></p>
+                     <p>Source Node: <span className={`font-bold ${viewRecord.source === 'hospital' ? 'text-cyan-400' : 'text-white'}`}>{viewRecord.source.toUpperCase()}</span></p>
                      <p>Verification Status: <span className={viewRecord.verified ? 'text-emerald-400' : 'text-yellow-400'}>{viewRecord.verified ? 'HUMAN VERIFIED' : 'AI UNVERIFIED'}</span></p>
+                     {viewRecord.doctor && <p className="mt-2 text-indigo-400">Created by: {viewRecord.doctor}</p>}
                   </div>
                </div>
             </div>
