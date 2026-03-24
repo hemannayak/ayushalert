@@ -158,7 +158,7 @@ export default function DoctorDashboard() {
                         if (data.status === 'approved') {
                             // Patient approved via OTP! View records!
                             try {
-                               const recordsData = await fetch(`/api/doctor/records?patient_id=${scannedPatientId}`, {
+                               const recordsData = await fetch(`/api/doctor/records?patient_id=${scannedPatientId}&request_id=${consentRequestId}`, {
                                    headers: { 'x-api-key': 'demo_hospital_key_2024' }
                                });
                                if (recordsData.ok) {

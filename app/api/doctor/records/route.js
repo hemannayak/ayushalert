@@ -13,6 +13,7 @@ export async function GET(req) {
 
     const { searchParams } = new URL(req.url);
     const patient_id = searchParams.get('patient_id');
+    const request_id = searchParams.get('request_id');
 
     if (!patient_id) {
       return NextResponse.json({ error: 'patient_id is required' }, { status: 400 });
@@ -20,11 +21,11 @@ export async function GET(req) {
 
     await dbConnect();
 
-    // Check there is an approved consent for this patient from this hospital
-    const approvedConsent = await Consent.findOne({
-      patient_id,
-      status: 'approved'
-    });
+    // Find the specific approved consent if request_id is provided, else the latest one
+    let query = { patient_id, status: 'approved' };
+    if (request_id) query.request_id = request_id;
+
+    const approvedConsent = await Consent.findOne(query).sort({ created_at: -1, _id: -1 });
 
     if (!approvedConsent) {
       return NextResponse.json({ error: 'No approved consent found for this patient.' }, { status: 403 });
