@@ -37,10 +37,9 @@ export async function GET(req) {
       return NextResponse.json({ error: 'Access expired. Please request a new OTP from the patient.' }, { status: 403 });
     }
 
-    // Return only verified records
+    // Return all records (verified and unverified)
     const records = await Record.find({
-      patient_id,
-      verified: true
+      patient_id
     })
       .select('-face_embedding -__v')
       .sort({ uploaded_at: -1 })
