@@ -223,7 +223,7 @@ export default function PatientUpload() {
                    <p className="text-sm text-zinc-500 mb-4">Support PDF, JPG, PNG parameters</p>
                    <input
                      type="file"
-                     accept=".png,.jpg,.jpeg,.pdf"
+                     accept=".png,.jpg,.jpeg,.pdf,.docx,.doc"
                      onChange={e => setFile(e.target.files?.[0] || null)}
                      className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                    />

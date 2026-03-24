@@ -14,38 +14,49 @@ export async function POST(req) {
     const token = authHeader.split(' ')[1];
     const decoded = verifyToken(token);
 
-    if (!decoded || !decoded.patient_id) {
+    if (!decoded || (!decoded.patient_id && !decoded.doctor_id)) {
       return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
     }
-
-    // According to process 2: Extract patient_id from the token
-    const tokenPatientId = decoded.patient_id;
 
     const formData = await req.formData();
     const file = formData.get('file');
     const document_type = formData.get('document_type') || 'Prescription';
-    const formDataPatientId = formData.get('patient_id');
-    const patient_id = formDataPatientId || tokenPatientId;
+    const patient_id = formData.get('patient_id') || decoded.patient_id;
+
+    if (!patient_id) {
+      return NextResponse.json({ error: 'patient_id is required' }, { status: 400 });
+    }
 
     if (!file) {
       return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
     }
 
-    const allowedTypes = ['application/pdf', 'image/png', 'image/jpeg', 'image/jpg'];
-    if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json({ error: 'Invalid file type. Allowed: pdf, png, jpg, jpeg' }, { status: 400 });
+    const ext = file.name.split('.').pop().toLowerCase();
+    const allowedExts = ['pdf', 'png', 'jpg', 'jpeg', 'docx', 'doc'];
+    
+    if (!allowedExts.includes(ext)) {
+      return NextResponse.json({ error: 'Invalid file type. Allowed: pdf, png, jpg, jpeg, docx' }, { status: 400 });
     }
 
     const fileBuffer = await file.arrayBuffer();
     const base64Data = Buffer.from(fileBuffer).toString('base64');
-    const dataURI = `data:${file.type};base64,${base64Data}`;
+    
+    // Construct dataURI according to extension
+    let mimeType = file.type;
+    if (!mimeType) {
+        if (ext === 'pdf') mimeType = 'application/pdf';
+        else if (ext === 'png') mimeType = 'image/png';
+        else if (['jpg', 'jpeg'].includes(ext)) mimeType = 'image/jpeg';
+        else mimeType = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
+    }
+    const dataURI = `data:${mimeType};base64,${base64Data}`;
 
     const uploadOptions = {
       folder: 'health_records',
-      resource_type: file.type === 'application/pdf' ? 'image' : 'auto',
+      resource_type: ['docx', 'doc'].includes(ext) ? 'raw' : (ext === 'pdf' ? 'image' : 'auto'),
     };
 
-    if (file.type === 'application/pdf') {
+    if (ext === 'pdf') {
        uploadOptions.format = 'pdf';
     }
 
