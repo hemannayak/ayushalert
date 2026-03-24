@@ -23,6 +23,10 @@ export default function DoctorDashboard() {
   // Timer state
   const [timeLeft, setTimeLeft] = useState(600); // 10 minutes
 
+  // Live Records State
+  const [patientRecords, setPatientRecords] = useState<any[]>([]);
+  const [viewRecord, setViewRecord] = useState<any>(null);
+
   useEffect(() => {
     const dId = localStorage.getItem('doctor_id');
     if (!dId) {
@@ -153,6 +157,17 @@ export default function DoctorDashboard() {
                         const data = await res.json();
                         if (data.status === 'approved') {
                             // Patient approved via OTP! View records!
+                            try {
+                               const recordsData = await fetch(`/api/doctor/records?patient_id=${scannedPatientId}`, {
+                                   headers: { 'x-api-key': 'demo_hospital_key_2024' }
+                               });
+                               if (recordsData.ok) {
+                                  const realRecords = await recordsData.json();
+                                  setPatientRecords(realRecords);
+                               }
+                            } catch (e) {
+                               console.error("Failed to fetch live records");
+                            }
                             setStep(3);
                             setTimeLeft(600);
                         } else if (data.status === 'rejected') {
@@ -315,22 +330,27 @@ export default function DoctorDashboard() {
               <div className="grid lg:grid-cols-3 gap-8">
                  <div className="lg:col-span-2 border border-zinc-800/80 rounded-2xl p-6 bg-zinc-900/30 shadow-inner">
                     <h3 className="font-bold text-white mb-6 uppercase tracking-widest text-sm flex items-center gap-2 border-l-4 border-indigo-500 pl-3">
-                       Mock Patient Ledger
+                       Live Patient Ledger
                     </h3>
                     <ul className="space-y-4">
-                        {[
-                          { title: 'X-Ray Radiology Report', date: 'Oct 12, 2025', id: 'REC_8A92F1' },
-                          { title: 'Blood Test Analysis Panel', date: 'Jan 4, 2026', id: 'REC_99B4E3' }
-                        ].map((mockRec, idx) => (
-                           <li key={idx} className="glass-card p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 group hover:-translate-y-1 transition-all">
+                        {patientRecords.length === 0 ? (
+                            <li className="text-zinc-500 text-sm italic py-4">No decentralized records located for this node.</li>
+                        ) : patientRecords.map((record, idx) => (
+                           <li key={idx} className="glass-card p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 group hover:-translate-y-1 transition-all border border-zinc-700/50 rounded-xl bg-zinc-900/60 shadow-inner">
                               <div>
-                                 <p className="font-bold text-white text-lg">{mockRec.title}</p>
-                                 <div className="flex gap-4 mt-1 text-xs font-mono text-zinc-500">
-                                     <span>TS: {mockRec.date}</span>
-                                     <span>ID: {mockRec.id}</span>
+                                 <div className="flex items-center gap-3">
+                                   <p className="font-bold text-white text-lg">{record.document_type || 'Clinical Document'}</p>
+                                   <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${record.verified ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'}`}>
+                                      {record.verified ? 'Verified' : 'Unverified'}
+                                   </span>
+                                 </div>
+                                 <div className="flex flex-wrap gap-4 mt-2 text-xs font-mono text-zinc-500">
+                                     <span>TS: {new Date(record.uploaded_at).toLocaleDateString()}</span>
+                                     <span>ID: {record.record_id}</span>
+                                     <span className="text-indigo-400">SRC: {record.source.toUpperCase()}</span>
                                  </div>
                               </div>
-                              <button className="bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 px-5 py-2.5 rounded-lg text-sm font-bold transition shadow-inner w-full sm:w-auto">
+                              <button onClick={() => setViewRecord(record)} className="bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 px-5 py-2.5 rounded-lg text-sm font-bold transition shadow-inner w-full sm:w-auto mt-3 sm:mt-0">
                                  Decrypt View
                               </button>
                            </li>
@@ -349,6 +369,69 @@ export default function DoctorDashboard() {
               </div>
           </div>
       )}
+
+      {/* SECURE DECRYPTION MODAL */}
+      {viewRecord && (
+        <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300" onClick={() => setViewRecord(null)}>
+          <div className="bg-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden shadow-[0_0_50px_rgba(0,0,0,1)] w-full max-w-5xl max-h-[95vh] flex flex-col relative" onClick={e => e.stopPropagation()}>
+            <div className="p-5 border-b border-zinc-800 bg-zinc-900/50 flex justify-between items-center relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-emerald-500"></div>
+              <div>
+                 <h3 className="font-bold text-white text-lg flex items-center gap-2">
+                    <span className="text-indigo-500">🔐</span> Secure Record Decryption: {viewRecord.document_type || 'Document'}
+                 </h3>
+                 <p className="text-zinc-500 text-xs font-mono mt-1">HASH: {viewRecord.record_id}</p>
+              </div>
+              <button onClick={() => setViewRecord(null)} className="text-zinc-400 hover:text-white hover:bg-zinc-800 font-bold px-4 py-2 rounded-lg transition border border-zinc-800">Close Pipeline</button>
+            </div>
+            
+            <div className="flex flex-col md:flex-row flex-1 overflow-hidden h-[75vh]">
+               {/* Image Preview Side */}
+               <div className="md:w-1/2 p-4 bg-black flex items-center justify-center overflow-auto border-r border-zinc-800 relative group">
+                  <div className="text-zinc-700 absolute inset-0 flex items-center justify-center font-mono opacity-20 pointer-events-none select-none text-xl rotate-45">ENCRYPTED ORIGIN</div>
+                  {viewRecord.file_url?.toLowerCase().includes('.pdf') || viewRecord.file_url?.toLowerCase().includes('.docx') || viewRecord.file_url?.toLowerCase().includes('.doc') ? (
+                    <iframe src={viewRecord.file_url} className="w-full h-full rounded border border-zinc-800 relative z-10" />
+                  ) : (
+                    <img src={viewRecord.file_url} alt="Medical Record" className="max-w-full max-h-full object-contain rounded-lg shadow-2xl relative z-10" />
+                  )}
+               </div>
+
+               {/* Data Side */}
+               <div className="md:w-1/2 p-6 bg-zinc-900/30 overflow-y-auto">
+                  <h4 className="font-bold text-emerald-400 uppercase tracking-widest text-sm mb-6 border-b border-emerald-900 pb-2">AI-Vectored Cryptographic Data</h4>
+                  
+                  {viewRecord.structured_data ? (
+                     <div className="space-y-6">
+                        {['diagnosis', 'symptoms', 'medicines', 'dosage'].map(field => {
+                           const dataArr = viewRecord.structured_data[field];
+                           if (!dataArr || dataArr.length === 0) return null;
+                           return (
+                              <div key={field} className="bg-zinc-950/50 border border-zinc-800/80 rounded-xl p-4 shadow-inner">
+                                 <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest block mb-2">{field}</span>
+                                 <ul className="text-sm text-zinc-300 font-mono space-y-1">
+                                    {dataArr.map((item: string, i: number) => (
+                                       <li key={i} className="flex gap-2"><span className="text-indigo-500">▶</span> {item}</li>
+                                    ))}
+                                 </ul>
+                              </div>
+                           );
+                        })}
+                     </div>
+                  ) : (
+                     <div className="text-zinc-500 italic text-sm">No structured data vectors available for this record block.</div>
+                  )}
+
+                  <div className="mt-8 pt-4 border-t border-zinc-800 text-xs text-zinc-500 font-mono space-y-1">
+                     <p>Neural Confidence: <span className="text-white">{viewRecord.confidence_score}%</span></p>
+                     <p>Source Node: <span className="text-white">{viewRecord.source.toUpperCase()}</span></p>
+                     <p>Verification Status: <span className={viewRecord.verified ? 'text-emerald-400' : 'text-yellow-400'}>{viewRecord.verified ? 'HUMAN VERIFIED' : 'AI UNVERIFIED'}</span></p>
+                  </div>
+               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
