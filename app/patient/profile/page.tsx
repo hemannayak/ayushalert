@@ -51,7 +51,7 @@ export default function PatientProfile() {
 
   const isMissingDetails = !patient?.gender || !patient?.dob || !patient?.pincode;
 
-  if (loading) return <div className="text-center mt-20 text-gray-500">Loading profile...</div>;
+  if (loading) return <div className="text-center mt-20 text-zinc-400">Loading profile...</div>;
 
   return (
     <div className="max-w-3xl mx-auto space-y-8 animate-in fade-in duration-500">
