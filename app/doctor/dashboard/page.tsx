@@ -68,17 +68,25 @@ export default function DoctorDashboard() {
   }, [step, timeLeft]);
 
   const startCamera = async () => {
-    if (!modelsLoaded) return;
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        setCameraActive(true);
-      }
-    } catch (err) {
-        alert("Camera required for patient identification");
+    if (!modelsLoaded) {
+      alert('Optics models warming up, please wait a moment.');
+      return;
     }
+    setCameraActive(true);
   };
+
+  useEffect(() => {
+    if (cameraActive && videoRef.current && !videoRef.current.srcObject) {
+      navigator.mediaDevices.getUserMedia({ video: true })
+        .then(stream => {
+          if (videoRef.current) videoRef.current.srcObject = stream;
+        })
+        .catch(err => {
+          alert("Camera required for patient identification");
+          setCameraActive(false);
+        });
+    }
+  }, [cameraActive]);
 
   useEffect(() => {
     let scanInterval: any;
