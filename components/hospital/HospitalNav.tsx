@@ -6,25 +6,25 @@ export default function HospitalNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="bg-teal-600 p-4 text-white shadow-md">
-      <div className="container mx-auto flex justify-between items-center">
-        <Link href="/hospital/search" className="text-xl font-bold">Hospital Portal</Link>
-        <div className="space-x-2 md:space-x-4">
+    <nav className="bg-[#009688] py-4 px-6 text-white w-full">
+      <div className="max-w-7xl mx-auto flex justify-between items-center">
+        <Link href="/hospital/search" className="text-xl font-bold tracking-tight">Hospital Portal</Link>
+        <div className="flex gap-6 text-sm font-medium">
           <Link 
             href="/hospital/search" 
-            className={`hover:underline px-2 py-1 rounded ${pathname === '/hospital/search' ? 'bg-teal-700' : ''}`}
+            className="hover:text-emerald-100 transition-colors"
           >
             Search Patients
           </Link>
           <Link 
             href="/hospital/request" 
-            className={`hover:underline px-2 py-1 rounded ${pathname === '/hospital/request' ? 'bg-teal-700' : ''}`}
+            className="hover:text-emerald-100 transition-colors"
           >
             Request Access
           </Link>
           <Link 
             href="/hospital/view-records" 
-            className={`hover:underline px-2 py-1 rounded ${pathname === '/hospital/view-records' ? 'bg-teal-700' : ''}`}
+            className="hover:text-emerald-100 transition-colors"
           >
             View Records
           </Link>

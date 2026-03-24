@@ -64,94 +64,99 @@ export default function HospitalMockPortal() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto mt-12 animate-in fade-in duration-500 px-4 pb-20">
-      <div className="glass-panel p-8 md:p-12 border-t-4 border-t-rose-600 relative overflow-hidden shadow-[0_0_50px_rgba(225,29,72,0.1)]">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-rose-600/10 blur-[80px] rounded-full pointer-events-none" />
+    <div className="max-w-2xl mx-auto mt-16 animate-in fade-in duration-500 px-4 pb-20">
+      <div className="bg-[#3b3b3b] rounded-xl p-8 shadow-xl text-white font-sans border border-[#444]">
         
-        <div className="relative z-10 mb-8 pb-6 border-b border-zinc-800/80">
-          <h2 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
-             <span className="text-rose-500">🏥</span> Clinical EHR Push Terminal
+        <div className="mb-8 border-b border-[#555] pb-6">
+          <h2 className="text-xl font-bold text-white flex items-center gap-3">
+             <svg className="w-5 h-5 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+             </svg>
+             Clinical EHR Push Terminal
           </h2>
-          <p className="text-zinc-400 text-sm mt-3 font-mono leading-relaxed">
-             <span className="text-rose-400 font-bold">SIMULATOR NODE:</span> Use this secure portal to forcefully push structured digital records directly into a target patient's decentralized ledger via ABDM/FHIR standards.
+          <p className="text-zinc-500 text-[10px] mt-2 font-mono leading-relaxed">
+             <span className="text-zinc-400 font-bold">SIMULATOR NODE:</span> Use this secure portal to forcefully push structured digital records directly into a target patient's decentralized ledger via ABDM/FHIR standards.
           </p>
         </div>
 
-        <div className="relative z-10">
+        <div>
           {status && (
-             <div className="bg-emerald-900/30 text-emerald-400 p-4 rounded-xl mb-6 text-sm font-semibold border border-emerald-500/30 flex items-center gap-3 shadow-inner">
-               <span className="text-xl">✓</span> {status}
+             <div className="bg-emerald-950/30 text-emerald-400 p-3 rounded-lg mb-6 text-sm font-semibold border border-emerald-900/50 flex flex-row items-center gap-3">
+               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+               {status}
              </div>
           )}
           {error && (
-             <div className="bg-rose-900/40 text-rose-200 p-4 rounded-xl mb-6 text-sm font-semibold border border-rose-500/50 shadow-inner flex items-center gap-3">
-               <span className="text-xl">⚠️</span> {error}
+             <div className="bg-red-950/30 text-[#ff004f] p-3 rounded-lg mb-6 text-sm font-semibold border border-[#ff004f]/30 flex flex-row items-center gap-3">
+               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+               {error}
              </div>
           )}
 
-          <div className="space-y-8">
-            <div className="bg-zinc-900/40 p-6 rounded-2xl border border-zinc-800/80 shadow-inner">
-               <h3 className="text-xs font-black uppercase tracking-widest text-zinc-500 mb-4 flex items-center gap-2">
-                 <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse" /> Target Identification
+          <div className="space-y-6">
+            <div className="bg-[#303030] p-6 rounded-xl border border-[#444]">
+               <h3 className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-5 flex items-center gap-2">
+                 <span className="w-1.5 h-1.5 rounded-full bg-[#ff004f]" /> TARGET IDENTIFICATION
                </h3>
-               <div className="grid md:grid-cols-2 gap-6 items-center">
-                 <div>
-                   <label className="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-wider">Patient ABHA ID</label>
+               
+               <div className="flex flex-col md:flex-row gap-4 items-stretch">
+                 <div className="flex-1">
+                   <label className="block text-[9px] font-bold text-zinc-400 mb-2 uppercase tracking-wider">Patient ABHA ID</label>
                    <input
                      type="text"
                      placeholder="12-3456-7890-1234"
                      value={abha_id}
                      onChange={e => setAbhaId(e.target.value)}
-                     className="w-full bg-zinc-950 border border-zinc-700/80 rounded-xl px-4 py-3 text-white text-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition shadow-inner font-mono placeholder-zinc-600"
+                     className="w-full bg-[#111111] border border-[#222] rounded-lg px-4 py-3 text-white text-xs focus:ring-1 focus:ring-[#ff004f] focus:border-[#ff004f] transition font-mono placeholder-zinc-600 outline-none"
                    />
                  </div>
-                 <div className="relative flex flex-col items-center justify-center">
-                    <div className="absolute inset-y-0 w-px bg-zinc-800 hidden md:block" />
-                    <span className="bg-zinc-900 text-zinc-500 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-zinc-800 relative z-10 my-4 md:my-0">Logical Or</span>
-                    <div className="absolute inset-x-0 h-px bg-zinc-800 md:hidden" />
+                 
+                 <div className="flex items-center justify-center py-2 md:py-0">
+                    <span className="bg-[#222222] text-zinc-500 text-[9px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-[#333]">Logical Or</span>
                  </div>
-                 <div>
-                   <label className="block text-xs font-bold text-zinc-400 mb-2 uppercase tracking-wider">Patient Email</label>
+                 
+                 <div className="flex-1">
+                   <label className="block text-[9px] font-bold text-zinc-400 mb-2 uppercase tracking-wider">Patient Email</label>
                    <input
                      type="email"
                      placeholder="target@network.local"
                      value={patient_email}
                      onChange={e => setEmail(e.target.value)}
-                     className="w-full bg-zinc-950 border border-zinc-700/80 rounded-xl px-4 py-3 text-white text-sm focus:ring-2 focus:ring-rose-500 focus:border-rose-500 transition shadow-inner font-mono placeholder-zinc-600"
+                     className="w-full bg-[#111111] border border-[#222] rounded-lg px-4 py-3 text-white text-xs focus:ring-1 focus:ring-[#ff004f] focus:border-[#ff004f] transition font-mono placeholder-zinc-600 outline-none"
                    />
                  </div>
                </div>
             </div>
 
-            <div className="bg-zinc-900/40 p-6 rounded-2xl border border-zinc-800/80 shadow-inner">
-              <h3 className="text-xs font-black uppercase tracking-widest text-zinc-500 mb-4 flex items-center gap-2">
-                 <span className="w-2 h-2 rounded-full bg-indigo-500" /> Payload Selection
+            <div className="bg-[#303030] p-6 rounded-xl border border-[#444]">
+              <h3 className="text-[9px] font-black uppercase tracking-widest text-zinc-400 mb-5 flex items-center gap-2">
+                 <span className="w-1.5 h-1.5 rounded-full bg-blue-500" /> PAYLOAD SELECTION
               </h3>
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-2 gap-3">
                 {DEMO_RECORDS.map((r, i) => (
                   <div
                     key={i}
                     onClick={() => setSelectedRecord(i)}
-                    className={`cursor-pointer p-5 rounded-xl border transition-all ${selectedRecord === i ? 'border-rose-500 bg-rose-900/20 shadow-[0_0_15px_rgba(225,29,72,0.15)] transform scale-[1.02]' : 'border-zinc-700/50 bg-zinc-950 hover:border-rose-500/50 hover:bg-zinc-900'}`}
+                    className={`cursor-pointer p-4 rounded-xl border transition-all ${selectedRecord === i ? 'border-[#ff004f] bg-[#3a2028]' : 'border-[#222] bg-[#111111] hover:border-[#ff004f]/50'}`}
                   >
-                    <p className="font-bold text-white mb-2">{r.diagnosis[0]}</p>
-                    <div className="space-y-1 text-xs font-mono">
-                       <p className="text-zinc-500"><span className="text-zinc-400">SYM:</span> {r.symptoms.slice(0, 2).join(', ')}...</p>
-                       <p className="text-zinc-500"><span className="text-zinc-400">DOC:</span> {r.doctor}</p>
+                    <p className="font-bold text-zinc-100 text-sm mb-2 leading-tight">{r.diagnosis[0]}</p>
+                    <div className="space-y-1 text-[10px] font-mono text-zinc-500 mt-2">
+                       <p><span className="text-zinc-400">SYM:</span> {r.symptoms.slice(0, 2).join(', ')}...</p>
+                       <p><span className="text-zinc-400">DOC:</span> {r.doctor}</p>
                     </div>
                     {selectedRecord === i && (
-                       <div className="mt-3 inline-block bg-rose-600/90 text-[10px] text-white font-bold uppercase tracking-widest px-2 py-0.5 rounded shadow">Active Payload</div>
+                       <div className="mt-3 inline-block bg-[#ff004f] text-[9px] text-white font-bold uppercase tracking-widest px-2 py-0.5 rounded">Active Payload</div>
                     )}
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className="pt-4">
+            <div className="pt-2">
                <button
                  onClick={handleIngest}
                  disabled={loading}
-                 className="w-full bg-rose-600 hover:bg-rose-500 text-white font-bold py-4 rounded-xl transition disabled:opacity-50 shadow-[0_0_20px_rgba(225,29,72,0.3)] disabled:shadow-none text-lg tracking-wide border border-rose-500/50 uppercase"
+                 className="w-full bg-[#ff004f] hover:bg-[#e60047] text-white font-bold py-4 rounded-xl transition-colors disabled:opacity-50 shadow-[0_4px_14px_0_rgba(255,0,79,0.39)] text-sm tracking-wide border border-[#ff004f] uppercase disabled:shadow-none"
                >
                  {loading ? 'Transmitting to Blockchain...' : 'Deploy Cryptographic Record'}
                </button>

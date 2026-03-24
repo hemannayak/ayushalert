@@ -216,14 +216,14 @@ export default function DoctorDashboard() {
     <div className="max-w-6xl mx-auto mt-10 space-y-8 px-4 animate-in fade-in duration-500 pb-20">
       
       {/* HEADER */}
-      <div className="glass-panel p-6 border-t-4 border-t-emerald-500 relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/10 blur-[80px] rounded-full pointer-events-none" />
+      <div className="glass-panel p-6 border-b border-zinc-800/80 relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-zinc-950/50">
         <div className="relative z-10">
-           <h1 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
-              <span className="text-emerald-400">🏥</span> Clinical Authorization Portal 
+           <h1 className="text-2xl font-semibold text-zinc-100 tracking-tight flex items-center gap-3">
+              <svg className="w-6 h-6 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+              Clinical Authorization Portal
               {step === 3 && (
-                 <span className="ml-4 bg-red-900/30 text-red-400 border border-red-500/50 text-sm px-4 py-1.5 rounded-full animate-pulse shadow-inner font-mono tracking-widest flex items-center gap-2">
-                    <div className="w-2 h-2 rounded-full bg-red-500" />
+                 <span className="ml-4 bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs px-3 py-1 rounded-full font-mono tracking-widest flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     LIVE ACCESS: {formatTime(timeLeft)}
                  </span>
               )}
@@ -246,10 +246,9 @@ export default function DoctorDashboard() {
             <div className="grid md:grid-cols-2 gap-8 items-start relative z-10">
                 
                 {/* MANUAL ID ENTRY */}
-                <div className="bg-zinc-900/40 p-8 rounded-2xl border border-zinc-800/80 hover:border-indigo-500/30 transition-colors flex flex-col h-full shadow-inner relative group">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <h3 className="font-bold text-indigo-400 mb-6 uppercase tracking-widest text-sm flex items-center gap-2">
-                       <span className="bg-indigo-900/30 text-indigo-300 w-6 h-6 rounded flex items-center justify-center border border-indigo-500/30">1</span> Analog Entry
+                <div className="bg-zinc-950/40 p-8 rounded-2xl border border-zinc-800/80 hover:bg-zinc-900/50 transition-colors flex flex-col h-full relative group">
+                    <h3 className="font-semibold text-zinc-300 mb-6 text-sm flex items-center gap-2">
+                       <span className="bg-zinc-800 text-zinc-400 w-6 h-6 rounded flex items-center justify-center text-xs">1</span> Analog Entry
                     </h3>
                     <div className="flex-1 flex flex-col justify-center gap-4">
                        <input 
@@ -257,12 +256,12 @@ export default function DoctorDashboard() {
                           placeholder="Enter Network ID (PAT_...)" 
                           value={manualPatientId} 
                           onChange={e => setManualPatientId(e.target.value)} 
-                          className="w-full bg-zinc-950 border border-zinc-700/80 p-4 rounded-xl text-center font-mono text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-inner text-lg placeholder-zinc-600"
+                          className="w-full bg-zinc-950 border border-zinc-800 p-4 rounded-xl text-center font-mono text-zinc-200 outline-none focus:border-zinc-600 transition text-sm placeholder-zinc-600 mb-4"
                        />
                        <button 
                           onClick={() => handleRequestAccess(manualPatientId)} 
                           disabled={!manualPatientId.trim()}
-                          className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl transition disabled:opacity-50 shadow-[0_0_15px_rgba(79,70,229,0.3)] disabled:shadow-none"
+                          className="w-full bg-zinc-100 hover:bg-white text-black font-semibold py-3.5 rounded-xl transition-colors disabled:opacity-50 text-sm"
                        >
                           Initialize Authorization
                        </button>
@@ -270,24 +269,22 @@ export default function DoctorDashboard() {
                 </div>
 
                 {/* BIOMETRIC SCAN */}
-                <div className="bg-zinc-900/40 p-8 rounded-2xl border border-zinc-800/80 hover:border-emerald-500/30 transition-colors flex flex-col h-full shadow-inner relative group">
-                    <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-emerald-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                    <h3 className="font-bold text-emerald-400 mb-6 uppercase tracking-widest text-sm flex items-center gap-2">
-                       <span className="bg-emerald-900/30 text-emerald-300 w-6 h-6 rounded flex items-center justify-center border border-emerald-500/30">2</span> Identity Biometrics
+                <div className="bg-zinc-950/40 p-8 rounded-2xl border border-zinc-800/80 hover:bg-zinc-900/50 transition-colors flex flex-col h-full relative group">
+                    <h3 className="font-semibold text-zinc-300 mb-6 text-sm flex items-center gap-2">
+                       <span className="bg-zinc-800 text-zinc-400 w-6 h-6 rounded flex items-center justify-center text-xs">2</span> Identity Biometrics
                     </h3>
                     
                     <div className="flex-1 flex flex-col justify-center">
                        {!cameraActive ? (
-                          <button onClick={startCamera} className="w-full bg-zinc-950 hover:bg-black text-white font-bold py-4 px-4 rounded-xl transition border border-zinc-700/80 shadow-inner group-hover:border-emerald-500/50 flex flex-col items-center gap-2">
-                            <span className="text-3xl mb-1">👁️</span>
+                          <button onClick={startCamera} className="w-full bg-zinc-900 border border-zinc-800 hover:bg-zinc-800 hover:text-white text-zinc-300 font-medium py-4 px-4 rounded-xl transition-colors flex items-center justify-center gap-2 text-sm">
+                            <svg className="w-5 h-5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
                             Activate Optics Matrix
                           </button>
                        ) : (
-                          <div className="flex flex-col items-center relative overflow-hidden rounded-xl border-2 border-emerald-500/50 shadow-[0_0_20px_rgba(16,185,129,0.2)] bg-black">
-                            <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-10 pointer-events-none mix-blend-overlay"></div>
+                          <div className="flex flex-col items-center relative overflow-hidden rounded-xl border border-zinc-700 bg-black">
                             <video ref={videoRef} autoPlay muted playsInline className="w-full h-full object-cover origin-center max-h-[250px]" />
-                            <div className="absolute bottom-0 left-0 w-full bg-emerald-900/80 backdrop-blur-md p-2 text-center border-t border-emerald-500/50">
-                               <p className="text-xs text-emerald-300 font-bold uppercase tracking-widest animate-pulse">Computing Facial Vectors...</p>
+                            <div className="absolute bottom-0 left-0 w-full bg-zinc-950/80 backdrop-blur-md p-2 text-center border-t border-zinc-800">
+                               <p className="text-xs text-zinc-400 font-mono uppercase tracking-widest animate-pulse">Computing Facial Vectors...</p>
                             </div>
                           </div>
                        )}
@@ -300,15 +297,14 @@ export default function DoctorDashboard() {
 
       {/* STEP 2: AWAITING PATIENT OTP APPROVAL */}
       {step === 2 && (
-          <div className="glass-panel p-10 border-t-4 border-t-orange-500 text-center max-w-2xl mx-auto relative overflow-hidden animate-in zoom-in-95 duration-500">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-orange-500/5 blur-[100px] rounded-full pointer-events-none" />
-              <h2 className="text-3xl font-extrabold text-white mb-4 tracking-tight">Authorization Transmitted</h2>
-              <p className="text-2xl font-mono bg-orange-900/20 text-orange-400 border border-orange-500/30 inline-block px-6 py-3 rounded-xl font-bold mb-8 shadow-inner tracking-widest">{scannedPatientId}</p>
+          <div className="glass-panel p-10 border border-zinc-800/80 bg-zinc-950/40 text-center max-w-2xl mx-auto relative overflow-hidden animate-in zoom-in-95 duration-500 mt-12 rounded-2xl">
+              <h2 className="text-2xl font-semibold text-zinc-100 mb-4 tracking-tight">Authorization Transmitted</h2>
+              <p className="text-lg font-mono bg-zinc-900 border border-zinc-800 text-zinc-300 inline-block px-5 py-2 rounded-lg font-semibold mb-8">{scannedPatientId}</p>
               
-              <div className="border border-zinc-800/80 p-8 rounded-2xl bg-zinc-900/40 flex flex-col items-center justify-center relative z-10 shadow-inner">
-                  <div className="w-16 h-16 border-4 border-orange-500/30 border-t-orange-500 rounded-full animate-spin mb-6" />
-                  <h3 className="font-bold text-white mb-3 text-lg">Awaiting Cryptographic Handshake...</h3>
-                  <p className="text-sm text-zinc-400 max-w-md mx-auto leading-relaxed">
+              <div className="border border-zinc-800/50 p-8 rounded-2xl bg-zinc-900/30 flex flex-col items-center justify-center relative z-10 transition-colors">
+                  <div className="w-10 h-10 border-2 border-zinc-700 border-t-zinc-300 rounded-full animate-spin mb-6" />
+                  <h3 className="font-semibold text-zinc-200 mb-3 text-sm">Awaiting Cryptographic Handshake...</h3>
+                  <p className="text-xs text-zinc-500 max-w-sm mx-auto leading-relaxed">
                      A live consent protocol has been triggered. The patient must review the request on their device and authenticate via a time-sensitive One-Time Password to temporarily unlock the required analog records.
                   </p>
               </div>
@@ -344,27 +340,27 @@ export default function DoctorDashboard() {
                         {patientRecords.length === 0 ? (
                             <li className="text-zinc-500 text-sm italic py-4">No decentralized records located for this node.</li>
                         ) : patientRecords.map((record, idx) => (
-                           <li key={idx} className="glass-card p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 group hover:-translate-y-1 transition-all border border-zinc-700/50 rounded-xl bg-zinc-900/60 shadow-inner">
+                           <li key={idx} className="bg-zinc-950/40 p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 hover:bg-zinc-900/60 transition-colors border border-zinc-800/80 rounded-xl">
                               <div>
                                  <div className="flex items-center gap-3">
-                                   <p className="font-bold text-white text-lg">{record.document_type || 'Clinical Document'}</p>
+                                   <p className="font-medium text-zinc-200 text-sm">{record.document_type || 'Clinical Document'}</p>
                                    {record.data_origin === 'emr' ? (
-                                      <span className="text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 flex items-center gap-1">
-                                         🏥 Hospital Verified (EMR)
+                                      <span className="text-[10px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-300 border border-zinc-700/50 flex items-center gap-1">
+                                         Hospital Verified (EMR)
                                       </span>
                                    ) : (
-                                      <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded-full ${record.verified ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' : 'bg-yellow-500/20 text-yellow-400 border border-yellow-500/30'} flex items-center gap-1`}>
-                                         🤖 AI Extracted (PHR)
+                                      <span className={`text-[10px] font-semibold uppercase tracking-widest px-2 py-0.5 rounded-full ${record.verified ? 'bg-zinc-800 text-zinc-300 border border-zinc-700/50' : 'bg-zinc-900/50 text-zinc-500 border border-zinc-800/50'} flex items-center gap-1`}>
+                                         AI Extracted (PHR)
                                       </span>
                                    )}
                                  </div>
-                                 <div className="flex flex-wrap gap-4 mt-2 text-xs font-mono text-zinc-400">
-                                     <span>TS: <span className="text-zinc-200">{new Date(record.uploaded_at).toLocaleString()}</span></span>
-                                     <span>ID: <span className="text-zinc-200">{record.record_id}</span></span>
-                                     {record.doctor && <span className="text-indigo-400 flex items-center gap-1">👨‍⚕️ {record.doctor}</span>}
+                                 <div className="flex flex-wrap gap-4 mt-2 text-xs font-mono text-zinc-500">
+                                     <span>TS: <span className="text-zinc-400">{new Date(record.uploaded_at).toLocaleString()}</span></span>
+                                     <span>ID: <span className="text-zinc-400">{record.record_id}</span></span>
+                                     {record.doctor && <span className="text-zinc-400 font-sans flex items-center gap-1">Dr. {record.doctor.replace('Dr. ', '')}</span>}
                                  </div>
                               </div>
-                              <button onClick={() => setViewRecord(record)} className="bg-indigo-600/20 hover:bg-indigo-600/40 text-indigo-300 border border-indigo-500/30 px-5 py-2.5 rounded-lg text-sm font-bold transition shadow-inner w-full sm:w-auto mt-3 sm:mt-0">
+                              <button onClick={() => setViewRecord(record)} className="bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 hover:border-zinc-700 px-4 py-2 rounded-lg text-xs font-medium transition-colors w-full sm:w-auto mt-3 sm:mt-0">
                                  Decrypt View
                               </button>
                            </li>
@@ -372,13 +368,12 @@ export default function DoctorDashboard() {
                     </ul>
                  </div>
 
-                 <div className="border border-emerald-900/50 rounded-2xl p-8 bg-emerald-900/10 flex flex-col items-center justify-center text-center shadow-inner relative overflow-hidden group">
-                     <div className="absolute inset-0 bg-gradient-to-br from-emerald-500/5 to-transparent pointer-events-none" />
-                     <div className="w-20 h-20 bg-emerald-900/30 border border-emerald-500/30 rounded-full flex items-center justify-center text-4xl mb-6 shadow-[0_0_30px_rgba(16,185,129,0.2)] group-hover:scale-110 transition-transform">
-                        🛡️
+                 <div className="border border-zinc-800/80 rounded-2xl p-8 bg-zinc-950/30 flex flex-col items-center justify-center text-center relative overflow-hidden group">
+                     <div className="w-12 h-12 bg-zinc-900 border border-zinc-800 rounded-xl flex items-center justify-center mb-6 shadow-sm">
+                        <svg className="w-6 h-6 text-zinc-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                      </div>
-                     <h3 className="font-bold text-emerald-400 mb-3 text-lg">ABDM & FHIR Compliance</h3>
-                     <p className="text-sm text-emerald-200/60 leading-relaxed font-medium">All parameters rendered in this sandbox remain securely stored on decentralized protocols. Analog data is strictly <strong className="text-emerald-300">not cached</strong> by the hospital endpoint, strictly enforcing ABDM data locality directives.</p>
+                     <h3 className="font-semibold text-zinc-200 mb-3 text-sm">ABDM & FHIR Compliance</h3>
+                     <p className="text-xs text-zinc-500 leading-relaxed font-medium">All parameters rendered in this sandbox remain securely stored on decentralized ledgers. Analog data is strictly <strong className="text-zinc-400">not cached</strong> by the hospital endpoint, enforcing stateless ABDM locality.</p>
                  </div>
               </div>
           </div>
@@ -386,35 +381,37 @@ export default function DoctorDashboard() {
 
       {/* SECURE DECRYPTION MODAL */}
       {viewRecord && (
-        <div className="fixed inset-0 bg-black/90 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300" onClick={() => setViewRecord(null)}>
-          <div className="bg-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden shadow-[0_0_50px_rgba(0,0,0,1)] w-full max-w-5xl max-h-[95vh] flex flex-col relative" onClick={e => e.stopPropagation()}>
-            <div className="p-5 border-b border-zinc-800 bg-zinc-900/50 flex justify-between items-center relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-emerald-500"></div>
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-[100] p-4 animate-in fade-in duration-300" onClick={() => setViewRecord(null)}>
+          <div className="bg-zinc-950 rounded-2xl border border-zinc-800 overflow-hidden shadow-2xl w-full max-w-5xl max-h-[95vh] flex flex-col relative" onClick={e => e.stopPropagation()}>
+            <div className="p-5 border-b border-zinc-800 flex justify-between items-center bg-zinc-950/80">
                <div>
-                 <h3 className="font-bold text-white text-lg flex items-center gap-2">
-                    <span className="text-indigo-500">🔐</span> Secure Record Decryption: {viewRecord.document_type || 'Document'}
+                 <h3 className="font-semibold text-zinc-100 text-base flex items-center gap-2">
+                    <svg className="w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8V7z" /></svg>
+                    Secure Decryption: {viewRecord.document_type || 'Document'}
                  </h3>
-                 <p className="text-zinc-500 text-xs font-mono mt-1">HASH: {viewRecord.record_id}</p>
+                 <p className="text-zinc-600 text-xs font-mono mt-1 uppercase tracking-widest">{viewRecord.record_id}</p>
               </div>
-              <div className="flex gap-3">
+              <div className="flex gap-3 items-center">
                  {viewRecord.data_origin === 'emr' && (
-                    <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-cyan-900/30 border border-cyan-500/30 rounded-lg text-cyan-400 text-xs font-bold tracking-widest uppercase">
-                       🏥 EMR Source
+                    <div className="hidden sm:flex items-center gap-2 px-3 py-1 bg-zinc-900 border border-zinc-800 rounded-lg text-zinc-400 text-[10px] font-semibold tracking-widest uppercase">
+                       EMR Source Node
                     </div>
                  )}
-                 <button onClick={() => setViewRecord(null)} className="text-zinc-400 hover:text-white hover:bg-zinc-800 font-bold px-4 py-2 rounded-lg transition border border-zinc-800">Close Pipeline</button>
+                 <button onClick={() => setViewRecord(null)} className="text-zinc-400 hover:text-white font-medium text-xs px-3 transition-colors">Close</button>
               </div>
             </div>
             
             <div className="flex flex-col md:flex-row flex-1 overflow-hidden h-[75vh]">
                {/* Image/Document Preview Side */}
-               <div className="md:w-1/2 p-4 bg-black flex items-center justify-center overflow-auto border-r border-zinc-800 relative group">
-                  <div className="text-zinc-700 absolute inset-0 flex items-center justify-center font-mono opacity-20 pointer-events-none select-none text-xl rotate-45">ENCRYPTED ORIGIN</div>
+               <div className="md:w-1/2 p-4 bg-zinc-950 flex items-center justify-center overflow-auto border-r border-zinc-800 relative group">
+                  <div className="text-zinc-800/50 absolute inset-0 flex items-center justify-center font-mono select-none text-xl rotate-45">ENCRYPTED ORIGIN</div>
                   {viewRecord.data_origin === 'emr' ? (
                      <div className="relative z-10 text-center space-y-4">
-                        <div className="w-24 h-24 bg-cyan-900/30 border border-cyan-500/30 rounded-full flex items-center justify-center mx-auto text-4xl shadow-[0_0_30px_rgba(6,182,212,0.2)]">🏥</div>
-                        <h4 className="text-cyan-400 font-bold text-lg">Hospital EMR Record</h4>
-                        <p className="text-zinc-400 text-sm max-w-xs mx-auto">This record was generated securely within an authorized hospital Electronic Medical Record system. No analog analog source document exists.</p>
+                        <div className="w-16 h-16 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mx-auto text-zinc-400 shadow-sm">
+                           <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" /></svg>
+                        </div>
+                        <h4 className="text-zinc-200 font-semibold text-sm">Hospital EMR Record</h4>
+                        <p className="text-zinc-500 text-xs max-w-xs mx-auto leading-relaxed">This record was generated securely within an authorized hospital Electronic Medical Record system. No analog source document exists to process.</p>
                      </div>
                   ) : (() => {
                     const url = viewRecord.file_url || '';
@@ -422,16 +419,16 @@ export default function DoctorDashboard() {
                     if (lowerUrl.includes('.docx') || lowerUrl.includes('.doc')) {
                        return <iframe src={`https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`} className="w-full h-full rounded border border-zinc-800 relative z-10 bg-white" />;
                     } else if (lowerUrl.includes('.pdf')) {
-                       return <img src={url.replace(/\.pdf$/i, '.jpg')} alt="Medical Document Vector" className="max-w-full max-h-full object-contain rounded-lg shadow-2xl relative z-10" />;
+                       return <img src={url.replace(/\.pdf$/i, '.jpg')} alt="Medical Document Vector" className="max-w-full max-h-full object-contain rounded-lg shadow-sm border border-zinc-800 relative z-10" />;
                     } else {
-                       return <img src={url} alt="Medical Record" className="max-w-full max-h-full object-contain rounded-lg shadow-2xl relative z-10" />;
+                       return <img src={url} alt="Medical Record" className="max-w-full max-h-full object-contain rounded-lg shadow-sm border border-zinc-800 relative z-10" />;
                     }
                   })()}
                </div>
 
                {/* Data Side */}
-               <div className="md:w-1/2 p-6 bg-zinc-900/30 overflow-y-auto">
-                  <h4 className="font-bold text-emerald-400 uppercase tracking-widest text-sm mb-6 border-b border-emerald-900 pb-2">AI-Vectored Cryptographic Data</h4>
+               <div className="md:w-1/2 p-6 bg-zinc-950/50 overflow-y-auto">
+                  <h4 className="font-semibold text-zinc-400 uppercase tracking-widest text-[10px] mb-6 border-b border-zinc-800/80 pb-2">Structured Ledger Data</h4>
                   
                   {viewRecord.structured_data ? (
                      <div className="space-y-6">
@@ -454,12 +451,12 @@ export default function DoctorDashboard() {
                      <div className="text-zinc-500 italic text-sm">No structured data vectors available for this record block.</div>
                   )}
 
-                  <div className="mt-8 pt-4 border-t border-zinc-800 text-xs text-zinc-500 font-mono space-y-1">
-                     <p>Created At: <span className="text-zinc-200">{new Date(viewRecord.uploaded_at).toLocaleString()}</span></p>
-                     <p>Neural Confidence: <span className="text-white">{viewRecord.confidence_score}%</span></p>
-                     <p>Source Node: <span className={`font-bold ${viewRecord.source === 'hospital' ? 'text-cyan-400' : 'text-white'}`}>{viewRecord.source.toUpperCase()}</span></p>
-                     <p>Verification Status: <span className={viewRecord.verified ? 'text-emerald-400' : 'text-yellow-400'}>{viewRecord.verified ? 'HUMAN VERIFIED' : 'AI UNVERIFIED'}</span></p>
-                     {viewRecord.doctor && <p className="mt-2 text-indigo-400">Created by: {viewRecord.doctor}</p>}
+                  <div className="mt-8 pt-4 border-t border-zinc-800/80 text-[10px] text-zinc-500 font-mono space-y-1.5 uppercase tracking-widest">
+                     <p>Created: <span className="text-zinc-300">{new Date(viewRecord.uploaded_at).toLocaleString()}</span></p>
+                     <p>Confidence: <span className="text-zinc-300">{viewRecord.confidence_score}%</span></p>
+                     <p>Origin: <span className="text-zinc-300">{viewRecord.source}</span></p>
+                     <p>Verified: <span className={viewRecord.verified ? 'text-zinc-300' : 'text-zinc-500'}>{viewRecord.verified ? 'TRUE' : 'FALSE'}</span></p>
+                     {viewRecord.doctor && <p className="mt-2 text-zinc-400 font-sans normal-case tracking-normal">Attending: Dr. {viewRecord.doctor.replace('Dr. ', '')}</p>}
                   </div>
                </div>
             </div>
