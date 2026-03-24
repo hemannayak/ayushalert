@@ -394,14 +394,20 @@ export default function DoctorDashboard() {
             </div>
             
             <div className="flex flex-col md:flex-row flex-1 overflow-hidden h-[75vh]">
-               {/* Image Preview Side */}
+               {/* Image/Document Preview Side */}
                <div className="md:w-1/2 p-4 bg-black flex items-center justify-center overflow-auto border-r border-zinc-800 relative group">
                   <div className="text-zinc-700 absolute inset-0 flex items-center justify-center font-mono opacity-20 pointer-events-none select-none text-xl rotate-45">ENCRYPTED ORIGIN</div>
-                  {viewRecord.file_url?.toLowerCase().includes('.pdf') || viewRecord.file_url?.toLowerCase().includes('.docx') || viewRecord.file_url?.toLowerCase().includes('.doc') ? (
-                    <iframe src={viewRecord.file_url} className="w-full h-full rounded border border-zinc-800 relative z-10" />
-                  ) : (
-                    <img src={viewRecord.file_url} alt="Medical Record" className="max-w-full max-h-full object-contain rounded-lg shadow-2xl relative z-10" />
-                  )}
+                  {(() => {
+                    const url = viewRecord.file_url || '';
+                    const lowerUrl = url.toLowerCase();
+                    if (lowerUrl.includes('.docx') || lowerUrl.includes('.doc')) {
+                       return <iframe src={`https://docs.google.com/viewer?url=${encodeURIComponent(url)}&embedded=true`} className="w-full h-full rounded border border-zinc-800 relative z-10 bg-white" />;
+                    } else if (lowerUrl.includes('.pdf')) {
+                       return <img src={url.replace(/\.pdf$/i, '.jpg')} alt="Medical Document Vector" className="max-w-full max-h-full object-contain rounded-lg shadow-2xl relative z-10" />;
+                    } else {
+                       return <img src={url} alt="Medical Record" className="max-w-full max-h-full object-contain rounded-lg shadow-2xl relative z-10" />;
+                    }
+                  })()}
                </div>
 
                {/* Data Side */}
