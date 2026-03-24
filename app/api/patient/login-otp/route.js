@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import dbConnect from '../../../../lib/mongodb.js';
 import Patient from '../../../../models/Patient.js';
-import { generateToken } from '../../../../utils/jwt.js';
+import { signToken } from '../../../../utils/jwt.js';
 import nodemailer from 'nodemailer';
 
 const transporter = nodemailer.createTransport({
