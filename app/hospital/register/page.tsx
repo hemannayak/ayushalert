@@ -42,30 +42,30 @@ export default function HospitalRegister() {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg mt-10 border-t-4 border-purple-600">
-      <h2 className="text-2xl font-bold mb-6 text-center text-purple-800">Hospital Registration</h2>
+    <div className="max-w-md mx-auto bg-zinc-900/80 backdrop-blur-xl p-8 rounded-xl shadow-lg mt-10 border-t-4 border-purple-600">
+      <h2 className="text-2xl font-bold mb-6 text-center text-white">Hospital Registration</h2>
       
       {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm font-semibold">{error}</div>}
       
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Hospital Name</label>
+          <label className="block text-sm font-medium text-zinc-300 mb-1">Hospital Name</label>
           <input required type="text" onChange={e => setFormData({...formData, name: e.target.value})} className="w-full border rounded-md p-2" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Government Registration ID</label>
+          <label className="block text-sm font-medium text-zinc-300 mb-1">Government Registration ID</label>
           <input required type="text" onChange={e => setFormData({...formData, registration_id: e.target.value})} className="w-full border rounded-md p-2 uppercase" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Full Address</label>
+          <label className="block text-sm font-medium text-zinc-300 mb-1">Full Address</label>
           <input required type="text" onChange={e => setFormData({...formData, address: e.target.value})} className="w-full border rounded-md p-2" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Admin Email</label>
+          <label className="block text-sm font-medium text-zinc-300 mb-1">Admin Email</label>
           <input required type="email" onChange={e => setFormData({...formData, admin_email: e.target.value})} className="w-full border rounded-md p-2" />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Secure Password</label>
+          <label className="block text-sm font-medium text-zinc-300 mb-1">Secure Password</label>
           <input required type="password" onChange={e => setFormData({...formData, password: e.target.value})} className="w-full border rounded-md p-2" />
         </div>
         
@@ -74,7 +74,7 @@ export default function HospitalRegister() {
         </button>
       </form>
 
-      <p className="mt-6 text-center text-sm text-gray-500">
+      <p className="mt-6 text-center text-sm text-zinc-500">
         Already registered? <Link href="/hospital/login" className="text-purple-600 hover:underline">Login here</Link>
       </p>
     </div>

@@ -33,10 +33,10 @@ export default function ViewRecords() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white p-8 rounded-xl shadow-lg mt-10 border-t-4 border-teal-600">
-      <h2 className="text-2xl font-bold mb-6 text-teal-800">Retrieve Patient Medical Records</h2>
+    <div className="max-w-3xl mx-auto bg-zinc-900/80 backdrop-blur-xl p-8 rounded-xl shadow-lg mt-10 border-t-4 border-teal-600">
+      <h2 className="text-2xl font-bold mb-6 text-white">Retrieve Patient Medical Records</h2>
       
-      <p className="text-gray-600 mb-6 font-medium">
+      <p className="text-zinc-400 mb-6 font-medium">
         Enter the authorized Record ID. The URL retrieved from this interface simulates what the OCR/FHIR module extracts.
       </p>
       
@@ -50,7 +50,7 @@ export default function ViewRecords() {
           value={recordId}
           type="text" 
           onChange={(e) => setRecordId(e.target.value)} 
-          className="flex-grow border border-gray-300 rounded-md shadow-sm p-3 text-black font-mono" 
+          className="flex-grow border border-zinc-800/50 rounded-md shadow-sm p-3 text-black font-mono" 
         />
         <button 
           disabled={loading} 
@@ -62,26 +62,26 @@ export default function ViewRecords() {
       </form>
 
       {recordData && (
-        <div className="bg-gray-50 border border-gray-200 rounded-lg p-6">
-          <h3 className="text-lg font-bold text-gray-800 mb-4 border-b pb-2">Record Metadata Authenticated</h3>
+        <div className="bg-gray-50 border border-zinc-800/80 rounded-lg p-6">
+          <h3 className="text-lg font-bold text-zinc-200 mb-4 border-b pb-2">Record Metadata Authenticated</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
-              <span className="text-sm text-gray-500 block">Record ID</span>
-              <span className="font-mono font-medium text-gray-900">{recordData.record_id}</span>
+              <span className="text-sm text-zinc-500 block">Record ID</span>
+              <span className="font-mono font-medium text-zinc-100">{recordData.record_id}</span>
             </div>
             <div>
-              <span className="text-sm text-gray-500 block">Patient ID</span>
-              <span className="font-mono font-medium text-gray-900">{recordData.patient_id}</span>
+              <span className="text-sm text-zinc-500 block">Patient ID</span>
+              <span className="font-mono font-medium text-zinc-100">{recordData.patient_id}</span>
             </div>
             <div>
-              <span className="text-sm text-gray-500 block">OCR Status</span>
+              <span className="text-sm text-zinc-500 block">OCR Status</span>
               <span className={`inline-block px-2 py-1 text-xs rounded-full font-bold uppercase mt-1 ${recordData.ocr_status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-green-100 text-green-800'}`}>
                 {recordData.ocr_status}
               </span>
             </div>
           </div>
           
-          <div className="mt-8 pt-6 border-t border-gray-200 text-center">
+          <div className="mt-8 pt-6 border-t border-zinc-800/80 text-center">
             <a 
               href={recordData.file_url} 
               target="_blank" 
@@ -90,7 +90,7 @@ export default function ViewRecords() {
             >
               Open Medical Record securely
             </a>
-            <p className="text-xs text-gray-400 mt-3 truncate px-4">URL: {recordData.file_url}</p>
+            <p className="text-xs text-zinc-500 mt-3 truncate px-4">URL: {recordData.file_url}</p>
           </div>
         </div>
       )}

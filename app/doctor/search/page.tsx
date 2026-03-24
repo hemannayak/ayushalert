@@ -46,9 +46,9 @@ export default function DoctorSearch() {
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-10 bg-white p-8 rounded-xl shadow">
-      <h2 className="text-2xl font-bold text-gray-800 mb-1">🩺 Patient Search</h2>
-      <p className="text-sm text-gray-500 mb-6">Search for a patient by their ABHA Health ID to request access to their records.</p>
+    <div className="max-w-xl mx-auto mt-10 bg-zinc-900/80 backdrop-blur-xl p-8 rounded-xl shadow">
+      <h2 className="text-2xl font-bold text-zinc-200 mb-1">🩺 Patient Search</h2>
+      <p className="text-sm text-zinc-500 mb-6">Search for a patient by their ABHA Health ID to request access to their records.</p>
 
       <div className="flex gap-3 mb-6">
         <input
@@ -57,7 +57,7 @@ export default function DoctorSearch() {
           value={query}
           onChange={e => setQuery(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && handleSearch()}
-          className="flex-1 border border-gray-300 rounded px-3 py-2 text-black text-sm"
+          className="flex-1 border border-zinc-800/50 rounded px-3 py-2 text-black text-sm"
         />
         <button
           onClick={handleSearch}
@@ -76,7 +76,7 @@ export default function DoctorSearch() {
             <p className="font-mono text-lg font-bold text-blue-800 mt-1">{result.abha_id}</p>
           </div>
 
-          <div className="bg-white border border-blue-100 rounded p-3 text-xs text-gray-600 space-y-1">
+          <div className="bg-zinc-900/80 backdrop-blur-xl border-zinc-800/80 border border-blue-100 rounded p-3 text-xs text-zinc-400 space-y-1">
             <p><strong>Purpose:</strong> Clinical review and treatment planning</p>
             <p><strong>Access:</strong> Verified health records only</p>
             <p><strong>Consent:</strong> Patient will receive OTP approval request</p>

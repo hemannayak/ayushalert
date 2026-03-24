@@ -14,8 +14,8 @@ export default function HospitalSearch() {
 
   return (
     <div className="max-w-2xl mx-auto mt-10">
-      <div className="bg-white p-8 rounded-xl shadow border-t-4 border-teal-600 text-center">
-        <h2 className="text-2xl font-bold mb-4 text-teal-800">Search Patient Data</h2>
+      <div className="bg-zinc-900/80 backdrop-blur-xl p-8 rounded-xl shadow border-t-4 border-teal-600 text-center">
+        <h2 className="text-2xl font-bold mb-4 text-white">Search Patient Data</h2>
         
         <form onSubmit={handleSearch} className="flex space-x-2 mt-6 justify-center">
           <input
@@ -23,7 +23,7 @@ export default function HospitalSearch() {
             placeholder="Enter Patient ID (e.g. PAT_123)"
             value={patientId}
             onChange={(e) => setPatientId(e.target.value)}
-            className="border border-gray-300 rounded-md p-3 w-64 text-black focus:ring-teal-500 focus:border-teal-500"
+            className="border border-zinc-800/50 rounded-md p-3 w-64 text-black focus:ring-teal-500 focus:border-teal-500"
           />
           <button type="submit" className="bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 px-6 rounded-md">
             Search
@@ -33,7 +33,7 @@ export default function HospitalSearch() {
         {patientId.trim() && (
           <div className="mt-8 bg-blue-50 border border-blue-200 p-6 rounded-lg text-left">
             <h3 className="font-semibold text-lg text-blue-800 mb-2">Patient Records Protected</h3>
-            <p className="text-gray-700 mb-4">
+            <p className="text-zinc-300 mb-4">
               To view health records for <span className="font-mono font-bold">{patientId}</span>, you need explicit patient consent. 
               After requesting access, wait for patient approval.
             </p>
@@ -46,7 +46,7 @@ export default function HospitalSearch() {
               </Link>
               <Link 
                 href="/hospital/view-records" 
-                className="inline-block bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 px-4 rounded transition"
+                className="inline-block bg-gray-200 hover:bg-gray-300 text-zinc-200 font-medium py-2 px-4 rounded transition"
               >
                 Check Approved Records
               </Link>

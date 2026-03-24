@@ -41,21 +41,21 @@ export default function HospitalRequestAccess() {
   };
 
   return (
-    <div className="max-w-xl mx-auto bg-white p-8 rounded-xl shadow-lg mt-10 border-t-4 border-teal-600">
-      <h2 className="text-2xl font-bold mb-6 text-teal-800">Request Patient Access</h2>
+    <div className="max-w-xl mx-auto bg-zinc-900/80 backdrop-blur-xl p-8 rounded-xl shadow-lg mt-10 border-t-4 border-teal-600">
+      <h2 className="text-2xl font-bold mb-6 text-white">Request Patient Access</h2>
       
       {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm">{error}</div>}
       {success && (
         <div className="bg-green-100 text-green-800 p-4 rounded mb-6 border border-green-200">
           <p className="font-semibold">{success.message}</p>
-          <p className="mt-1">Request ID: <span className="font-mono bg-white px-1 py-0.5 rounded">{success.request_id}</span></p>
+          <p className="mt-1">Request ID: <span className="font-mono bg-zinc-900/80 px-1 py-0.5 rounded">{success.request_id}</span></p>
           <p className="text-sm mt-2">The patient must approve this request from their portal before you can view records.</p>
         </div>
       )}
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700">Hospital ID</label>
+          <label className="block text-sm font-medium text-zinc-300">Hospital ID</label>
           <input 
             required 
             name="hospital_id" 
@@ -63,11 +63,11 @@ export default function HospitalRequestAccess() {
             value={formData.hospital_id}
             type="text" 
             onChange={handleChange} 
-            className="mt-1 w-full border border-gray-300 rounded-md shadow-sm p-3 text-black" 
+            className="mt-1 w-full border border-zinc-800/50 rounded-md shadow-sm p-3 text-black" 
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Patient ID</label>
+          <label className="block text-sm font-medium text-zinc-300">Patient ID</label>
           <input 
             required 
             name="patient_id" 
@@ -75,11 +75,11 @@ export default function HospitalRequestAccess() {
             value={formData.patient_id}
             type="text" 
             onChange={handleChange} 
-            className="mt-1 w-full border border-gray-300 rounded-md shadow-sm p-3 text-black" 
+            className="mt-1 w-full border border-zinc-800/50 rounded-md shadow-sm p-3 text-black" 
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-gray-700">Reason for Request</label>
+          <label className="block text-sm font-medium text-zinc-300">Reason for Request</label>
           <textarea 
             required 
             name="reason" 
@@ -87,7 +87,7 @@ export default function HospitalRequestAccess() {
             placeholder="Please specify why access is required..."
             value={formData.reason}
             onChange={handleChange} 
-            className="mt-1 w-full border border-gray-300 rounded-md shadow-sm p-3 text-black" 
+            className="mt-1 w-full border border-zinc-800/50 rounded-md shadow-sm p-3 text-black" 
           />
         </div>
         <button 

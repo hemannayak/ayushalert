@@ -31,14 +31,14 @@ export default function DoctorRecordsView() {
     fetchRecords();
   }, [patient_id]);
 
-  if (loading) return <div className="text-center mt-20 text-gray-500">Loading patient records...</div>;
+  if (loading) return <div className="text-center mt-20 text-zinc-500">Loading patient records...</div>;
 
   return (
     <div className="max-w-4xl mx-auto mt-10 space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">🗂️ Patient Health Timeline</h1>
-          <p className="text-sm text-gray-500">Patient ID: <span className="font-mono">{patient_id}</span></p>
+          <h1 className="text-2xl font-bold text-zinc-200">🗂️ Patient Health Timeline</h1>
+          <p className="text-sm text-zinc-500">Patient ID: <span className="font-mono">{patient_id}</span></p>
         </div>
         <button onClick={() => router.push('/doctor/search')} className="text-sm text-blue-600 hover:underline">← Search Another</button>
       </div>
@@ -46,7 +46,7 @@ export default function DoctorRecordsView() {
       {error && <div className="bg-red-100 text-red-700 p-3 rounded text-sm">{error}</div>}
 
       {records.length === 0 && !error && (
-        <div className="bg-white p-8 rounded-xl shadow text-center text-gray-400">No records found for this patient.</div>
+        <div className="bg-zinc-900/80 backdrop-blur-xl p-8 rounded-xl shadow text-center text-zinc-500">No records found for this patient.</div>
       )}
 
       {records.length > 0 && (
@@ -60,16 +60,16 @@ export default function DoctorRecordsView() {
             }, {} as Record<string, any[]>)
           ).map(([type, grpRecords]: any) => (
             <div key={type}>
-              <h3 className="text-xl font-semibold mb-4 text-gray-700 flex items-center gap-2">
-                📁 {type}s <span className="text-sm font-normal text-gray-400">({grpRecords.length})</span>
+              <h3 className="text-xl font-semibold mb-4 text-zinc-300 flex items-center gap-2">
+                📁 {type}s <span className="text-sm font-normal text-zinc-500">({grpRecords.length})</span>
               </h3>
               <div className="space-y-4">
                 {grpRecords.map((record: any) => (
-                  <div key={record.record_id} className="bg-white p-6 rounded-xl shadow border-l-4 border-green-400 space-y-3">
+                  <div key={record.record_id} className="bg-zinc-900/80 backdrop-blur-xl p-6 rounded-xl shadow border-l-4 border-green-400 space-y-3">
                     <div className="flex items-center justify-between">
                       <div>
-                        <p className="font-bold text-gray-800">{record.file_name}</p>
-                        <p className="text-xs text-gray-400 font-mono">{record.record_id}</p>
+                        <p className="font-bold text-zinc-200">{record.file_name}</p>
+                        <p className="text-xs text-zinc-500 font-mono">{record.record_id}</p>
                       </div>
                       <div className="flex flex-col items-end gap-1">
                         <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${record.source === 'hospital' ? 'bg-blue-100 text-blue-700' : 'bg-purple-100 text-purple-700'}`}>
@@ -86,8 +86,8 @@ export default function DoctorRecordsView() {
                         {['diagnosis', 'symptoms', 'medicines', 'dosage'].map(field => (
                           record.structured_data[field]?.length > 0 && (
                             <div key={field} className="bg-gray-50 rounded p-3">
-                              <p className="text-xs font-bold uppercase text-gray-500 mb-1">{field}</p>
-                              <ul className="text-sm text-gray-700 space-y-0.5">
+                              <p className="text-xs font-bold uppercase text-zinc-500 mb-1">{field}</p>
+                              <ul className="text-sm text-zinc-300 space-y-0.5">
                                 {record.structured_data[field].map((item: string, i: number) => (
                                   <li key={i}>• {item}</li>
                                 ))}
@@ -98,7 +98,7 @@ export default function DoctorRecordsView() {
                       </div>
                     )}
 
-                    <div className="flex items-center justify-between text-xs text-gray-400 pt-3 border-t mt-3">
+                    <div className="flex items-center justify-between text-xs text-zinc-500 pt-3 border-t mt-3">
                       <div className="space-x-3">
                         <span>Confidence: <strong>{record.confidence_score}%</strong></span>
                         <span>|</span>
@@ -122,10 +122,10 @@ export default function DoctorRecordsView() {
       {/* Record View Modal */}
       {viewRecord && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4" onClick={() => setViewRecord(null)}>
-          <div className="bg-white rounded-xl overflow-hidden shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+          <div className="bg-zinc-900/80 backdrop-blur-xl rounded-xl border border-zinc-800/80 overflow-hidden shadow-2xl w-full max-w-4xl max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
             <div className="p-4 border-b flex justify-between items-center bg-gray-50">
-              <h3 className="font-bold text-gray-800">{viewRecord.file_name}</h3>
-              <button onClick={() => setViewRecord(null)} className="text-gray-500 hover:text-red-500 font-bold px-3 py-1 bg-gray-200 rounded">Close</button>
+              <h3 className="font-bold text-zinc-200">{viewRecord.file_name}</h3>
+              <button onClick={() => setViewRecord(null)} className="text-zinc-500 hover:text-red-500 font-bold px-3 py-1 bg-gray-200 rounded">Close</button>
             </div>
             <div className="p-4 overflow-auto flex-1 bg-gray-100 flex items-center justify-center">
               {viewRecord.file_url.includes('.pdf') ? (

@@ -177,14 +177,14 @@ export default function DoctorLogin() {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-white p-8 rounded-xl shadow-lg mt-20 border-t-4 border-emerald-600">
-      <h2 className="text-2xl font-bold mb-6 text-center text-emerald-800">Doctor Secure Login</h2>
+    <div className="max-w-md mx-auto bg-zinc-900/80 backdrop-blur-xl p-8 rounded-2xl shadow-2xl mt-20 border border-zinc-800/80 shadow-emerald-500/5">
+      <h2 className="text-2xl font-extrabold mb-6 text-center text-white">Doctor Secure Login</h2>
       
-      {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4 text-sm font-semibold">{error}</div>}
+      {error && <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg mb-4 text-sm font-semibold">{error}</div>}
       
       <div className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-gray-700 font-semibold mb-1">Doctor ID</label>
+          <label className="block text-sm font-medium text-zinc-400 font-semibold mb-1">Doctor ID</label>
           <input 
             required 
             placeholder="DOC_..."
@@ -192,27 +192,27 @@ export default function DoctorLogin() {
             type="text" 
             onChange={(e) => setDoctorId(e.target.value)} 
             disabled={otpSent}
-            className="w-full border border-gray-300 rounded-md shadow-sm p-3 text-black text-center text-lg font-mono focus:ring-emerald-500 focus:border-emerald-500 disabled:bg-gray-100" 
+            className="w-full bg-zinc-950 border border-zinc-800 text-white rounded-xl shadow-sm p-3 text-center text-lg font-mono outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 disabled:bg-zinc-800 disabled:text-zinc-500" 
           />
         </div>
 
         {/* Method Toggle */}
         {!otpSent && (
-        <div className="flex bg-gray-100 p-1 rounded-lg">
-           <button onClick={() => setLoginMethod('face')} className={`flex-1 py-2 text-sm font-bold rounded-md transition ${loginMethod === 'face' ? 'bg-white shadow text-emerald-700' : 'text-gray-500 hover:text-gray-700'}`}>FaceID</button>
-           <button onClick={() => { setLoginMethod('otp'); stopCamera(); }} className={`flex-1 py-2 text-sm font-bold rounded-md transition ${loginMethod === 'otp' ? 'bg-white shadow text-emerald-700' : 'text-gray-500 hover:text-gray-700'}`}>Email OTP</button>
+        <div className="flex bg-black/40 p-1 rounded-xl border border-zinc-800/80 mt-4">
+           <button onClick={() => setLoginMethod('face')} className={`flex-1 py-2 rounded-lg font-bold text-sm transition ${loginMethod === 'face' ? 'bg-zinc-800 text-white shadow' : 'text-zinc-500 hover:text-zinc-300'}`}>FaceID</button>
+           <button onClick={() => { setLoginMethod('otp'); stopCamera(); }} className={`flex-1 py-2 rounded-lg font-bold text-sm transition ${loginMethod === 'otp' ? 'bg-zinc-800 text-white shadow' : 'text-zinc-500 hover:text-zinc-300'}`}>Email OTP</button>
         </div>
         )}
 
         {loginMethod === 'face' ? (
-        <div className="bg-gray-50 p-4 rounded-lg flex flex-col items-center">
-            {!modelsLoaded && <p className="text-sm text-gray-500 italic">Initializing Facial Model...</p>}
+        <div className="bg-black/40 border border-zinc-800/80 p-6 rounded-xl flex flex-col items-center mt-4">
+            {!modelsLoaded && <p className="text-sm text-zinc-500 italic">Initializing Facial Model...</p>}
             
             {modelsLoaded && !cameraActive && (
                 <button 
                   onClick={startCamera} 
                   disabled={!doctorId.trim()}
-                  className="bg-gray-800 hover:bg-black text-white px-6 py-2 rounded-full transition disabled:opacity-50"
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-2 rounded-xl transition disabled:opacity-50 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
                  >
                   Turn on Camera
                 </button>
@@ -228,47 +228,47 @@ export default function DoctorLogin() {
             />
 
             {cameraActive && !loading && countdown === null && (
-                <p className="mt-4 text-sm font-bold text-emerald-600 animate-pulse">
+                <p className="mt-4 text-sm font-bold text-emerald-400 animate-pulse">
                    Scanning for your face... Please look forward.
                 </p>
             )}
 
             {countdown !== null && (
-                <p className="mt-4 text-sm font-bold border border-green-300 bg-green-50 p-3 rounded text-green-700 animate-pulse text-center">
+                <p className="mt-4 text-sm font-bold border border-emerald-500/50 bg-emerald-500/10 p-3 rounded-lg text-emerald-400 animate-pulse text-center">
                    Face detected! Auto-logging in in <span className="text-xl mx-1">{countdown}</span> seconds...
                 </p>
             )}
 
             {loading && (
-                <p className="mt-4 text-sm font-bold text-green-600 animate-pulse">
+                <p className="mt-4 text-sm font-bold text-emerald-500 animate-pulse">
                    Authenticating...
                 </p>
             )}
         </div>
         ) : (
-          <div className="bg-gray-50 p-6 rounded-lg border border-gray-200 text-center">
+          <div className="mt-4 bg-black/40 p-6 rounded-xl border border-zinc-800/80 text-center">
              {!otpSent ? (
                 <div>
-                   <p className="text-sm text-gray-600 mb-4">A secure 6-digit code will be sent to your registered clinic email.</p>
-                   <button onClick={requestOtp} disabled={loading || !doctorId.trim()} className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-lg shadow transition disabled:opacity-50">
+                   <p className="text-sm text-zinc-400 mb-4">A secure 6-digit code will be sent to your registered clinic email.</p>
+                   <button onClick={requestOtp} disabled={loading || !doctorId.trim()} className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.3)] transition disabled:opacity-50">
                       {loading ? 'Generating...' : 'Send Login Code'}
                    </button>
                 </div>
              ) : (
                 <div className="space-y-4">
-                   <p className="text-sm text-green-700 font-semibold bg-green-100 p-2 rounded">✅ Secure code sent!</p>
+                   <p className="text-sm text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/30 p-2 rounded-lg">✅ Secure code sent!</p>
                    <input
                      type="text"
                      placeholder="Enter 6-digit OTP"
                      value={otp}
                      onChange={e => setOtp(e.target.value)}
-                     className="w-full border border-gray-300 rounded px-3 py-3 text-center text-black font-mono text-2xl tracking-[0.5em]"
+                     className="w-full bg-zinc-950 border border-zinc-800 text-white rounded-xl px-3 py-3 text-center font-mono text-2xl tracking-[0.5em] outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50"
                      maxLength={6}
                    />
-                   <button onClick={verifyOtp} disabled={loading || otp.length < 6} className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-lg shadow transition disabled:opacity-50">
+                   <button onClick={verifyOtp} disabled={loading || otp.length < 6} className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.3)] transition disabled:opacity-50">
                       {loading ? 'Verifying...' : 'Verify & Enter Portal'}
                    </button>
-                   <button onClick={() => { setOtpSent(false); setOtp(''); }} className="text-sm text-emerald-600 font-medium hover:underline mt-2">
+                   <button onClick={() => { setOtpSent(false); setOtp(''); }} className="text-sm text-emerald-400 font-medium hover:underline mt-2">
                       Use a different Doctor ID?
                    </button>
                 </div>
@@ -277,8 +277,8 @@ export default function DoctorLogin() {
         )}
       </div>
 
-      <p className="mt-8 text-center text-sm text-gray-500 border-t pt-4">
-        Don&apos;t have an account? <Link href="/doctor/register" className="text-emerald-600 hover:underline font-medium">Register here</Link>
+      <p className="mt-8 text-center text-sm text-zinc-500 border-t border-zinc-800/50 pt-4">
+        Don&apos;t have an account? <Link href="/doctor/register" className="text-emerald-500 hover:text-emerald-400 font-medium transition">Register here</Link>
       </p>
     </div>
   );
