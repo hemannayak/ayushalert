@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Medical Scanner</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+            --text-sub: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --accent: #7c3aed;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 640px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+        }
+
+        header p {
+            color: var(--text-sub);
+            font-size: 0.9rem;
+        }
+
+        .upload-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            border: 2px dashed var(--border);
+        }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-size: 0.95rem;
+            color: white;
+            transition: opacity 0.2s;
+        }
+
+        .btn:hover {
+            opacity: 0.88;
+        }
+
+        .btn-camera {
+            background-color: var(--primary);
+        }
+
+        .btn-file {
+            background-color: var(--text-sub);
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        #preview-container {
+            display: none;
+            margin-top: 20px;
+            position: relative;
+        }
+
+        #preview-img {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .remove-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        /* ── CAMERA MODAL ── */
+        #camera-modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        #camera-modal.open {
+            display: flex;
+        }
+
+        #camera-video {
+            border-radius: 12px;
+            max-width: 90vw;
+            max-height: 60vh;
+        }
+
+        .cam-controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-capture {
+            background: white;
+            color: #1e293b;
+            font-weight: 700;
+            padding: 12px 28px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+
+        .btn-cam-close {
+            background: #ef4444;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        #camera-canvas {
+            display: none;
+        }
+
+        /* ── LOADER ── */
+        .loader {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        #results-area {
+            display: none;
+        }
+
+        .result-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 16px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .tag.high {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        /* ── OVERALL ACCURACY BANNER ── */
+        .accuracy-banner {
+            background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            color: white;
+            margin-bottom: 16px;
+        }
+
+        .accuracy-value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #34d399, #059669);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+        }
+
+        .accuracy-bar-wrap {
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50px;
+            height: 10px;
+            margin: 12px 0 4px;
+        }
+
+        .accuracy-bar-fill {
+            height: 10px;
+            border-radius: 50px;
+            background: linear-gradient(90deg, #34d399, #059669);
+            transition: width 1s ease;
+        }
+
+        .meta-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin: 16px 0;
+            font-size: 0.9rem;
+        }
+
+        .meta-item label {
+            display: block;
+            color: var(--text-sub);
+            font-size: 0.8rem;
+            margin-bottom: 2px;
+        }
+
+        .meta-item span {
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+            margin-top: 10px;
+        }
+
+        .data-table th {
+            text-align: left;
+            padding: 10px;
+            background: #f1f5f9;
+            color: var(--text-sub);
+        }
+
+        .data-table td {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        #scan-btn {
+            background: var(--success);
+            width: 100%;
+            margin-top: 10px;
+            display: none;
+        }
+
+        /* ── PIPELINE STEPS ── */
+        .pipeline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin: 12px 0;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: #f1f5f9;
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .step.done {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .arrow {
+            color: #94a3b8;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+
+<body>
+    <!-- ── CAMERA MODAL ── -->
+    <div id="camera-modal">
+        <video id="camera-video" autoplay playsinline></video>
+        <canvas id="camera-canvas"></canvas>
+        <div class="cam-controls">
+            <button class="btn-capture" onclick="capturePhoto()">📸 Capture</button>
+            <button class="btn-cam-close" onclick="closeCamera()">✕ Close</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>🩺 AI Medical Scanner</h1>
+            <p>Upload any medical document — JPG, PNG, PDF, TIFF, WEBP &amp; more</p>
+        </header>
+
+        <div class="upload-card">
+            <div style="font-size: 3rem; margin-bottom: 10px;">📄</div>
+            <p style="color: var(--text-sub); font-size: 0.85rem;">Supports: JPG · PNG · WEBP · BMP · GIF ·
+                <strong>PDF</strong></p>
+            <div class="btn-group" style="margin-top: 16px;">
+                <button class="btn btn-camera" onclick="openCamera()">📷 Camera</button>
+                <label class="btn btn-file">📂 Upload<input type="file" id="fileInput"
+                        accept="image/jpeg,image/png,image/webp,image/gif,image/bmp,application/pdf"></label>
+            </div>
+        </div>
+
+        <div id="preview-container">
+            <img id="preview-img" src="" alt="Preview">
+            <div id="pdf-placeholder"
+                style="display:none; background:#f1f5f9; border-radius:12px; padding:30px; text-align:center; border:1px solid #e2e8f0;">
+            </div>
+            <button class="remove-btn" onclick="clearFile()">×</button>
+            <button id="scan-btn" class="btn" onclick="uploadAndScan()">✨ Analyze Document</button>
+        </div>
+
+        <div id="loader" class="loader">
+            <div class="spinner"></div>
+            <p id="loader-text" style="font-weight:600;">Sending to Gemini Vision AI...</p>
+            <p style="font-size: 0.8rem; color: var(--text-sub); margin-top: 5px;" id="loader-sub">Performing OCR
+                extraction &amp; structuring data...</p>
+        </div>
+
+        <div id="results-area"></div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        let currentScannedData = null;
+        let cameraStream = null;
+
+        const previewContainer = document.getElementById('preview-container');
+        const previewImg = document.getElementById('preview-img');
+        const pdfPlaceholder = document.getElementById('pdf-placeholder');
+        const scanBtn = document.getElementById('scan-btn');
+        const resultsArea = document.getElementById('results-area');
+        const loader = document.getElementById('loader');
+        const loaderText = document.getElementById('loader-text');
+        const loaderSub = document.getElementById('loader-sub');
+
+        // ── CAMERA ──
+        async function openCamera() {
+            const modal = document.getElementById('camera-modal');
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+                document.getElementById('camera-video').srcObject = cameraStream;
+                modal.classList.add('open');
+            } catch (err) {
+                alert('Camera not accessible. Please use the Upload button instead.\n\nError: ' + err.message);
+            }
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('camera-video');
+            const canvas = document.getElementById('camera-canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            canvas.toBlob(blob => {
+                selectedFile = new File([blob], 'camera_capture.jpg', { type: 'image/jpeg' });
+                previewImg.src = canvas.toDataURL('image/jpeg');
+                previewImg.style.display = 'block';
+                pdfPlaceholder.style.display = 'none';
+                previewContainer.style.display = 'block';
+                scanBtn.style.display = 'inline-flex';
+                resultsArea.innerHTML = '';
+                closeCamera();
+            }, 'image/jpeg', 0.95);
+        }
+
+        function closeCamera() {
+            if (cameraStream) { cameraStream.getTracks().forEach(t => t.stop()); cameraStream = null; }
+            document.getElementById('camera-modal').classList.remove('open');
+        }
+
+        // ── FILE UPLOAD ──
+        document.getElementById('fileInput').addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            selectedFile = file;
+            const isPDF = file.type === 'application/pdf' || file.name.toLowerCase().endsWith('.pdf');
+            if (isPDF) {
+                previewImg.style.display = 'none';
+                pdfPlaceholder.innerHTML = `<div style="font-size:3rem">📋</div><p style="margin-top:8px;font-weight:600;color:#334155">${file.name}</p><p style="font-size:0.8rem;color:#64748b">${(file.size / 1024).toFixed(1)} KB · PDF Document</p>`;
+                pdfPlaceholder.style.display = 'block';
+            } else {
+                pdfPlaceholder.style.display = 'none';
+                previewImg.style.display = 'block';
+                const reader = new FileReader();
+                reader.onload = ev => { previewImg.src = ev.target.result; };
+                reader.readAsDataURL(file);
+            }
+            previewContainer.style.display = 'block';
+            scanBtn.style.display = 'inline-flex';
+            resultsArea.innerHTML = '';
+        });
+
+        function clearFile() {
+            selectedFile = null;
+            previewContainer.style.display = 'none';
+            previewImg.style.display = 'block';
+            previewImg.src = '';
+            pdfPlaceholder.style.display = 'none';
+            document.getElementById('fileInput').value = '';
+        }
+
+        // ── UPLOAD & SCAN ──
+        async function uploadAndScan() {
+            if (!selectedFile) return;
+            scanBtn.style.display = 'none';
+            loader.style.display = 'block';
+            resultsArea.innerHTML = '';
+
+            loaderText.textContent = 'Sending to Gemini Vision AI...';
+            loaderSub.textContent = 'Performing OCR extraction & structuring data...';
+
+            const formData = new FormData();
+            formData.append('file', selectedFile);
+
+            try {
+                const response = await fetch('/analyze', { method: 'POST', body: formData });
+                if (!response.ok) {
+                    const err = await response.json();
+                    throw new Error(err.detail || response.statusText);
+                }
+                const data = await response.json();
+                currentScannedData = data;
+                renderResults(data);
+            } catch (error) {
+                resultsArea.innerHTML = `<div class="result-card" style="border-left:5px solid red"><h3>❌ Error</h3><p>${error.message}</p></div>`;
+            } finally {
+                loader.style.display = 'none';
+                scanBtn.style.display = 'inline-flex';
+            }
+        }
+
+        // ── UTILITY ──
+        function parseConfidence(val) {
+            if (!val) return null;
+            const n = parseFloat(String(val).replace('%', ''));
+            return isNaN(n) ? null : n;
+        }
+
+        function calcOverallAccuracy(items) {
+            if (!items || items.length === 0) return null;
+            const scores = items.map(i => parseConfidence(i.confidence_score)).filter(n => n !== null);
+            if (scores.length === 0) return null;
+            return (scores.reduce((a, b) => a + b, 0) / scores.length).toFixed(1);
+        }
+
+        function toggleCode(id) {
+            const el = document.getElementById(id);
+            el.style.display = el.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function downloadData(type) {
+            if (!currentScannedData) return;
+            let content, filename;
+            if (type === 'json') {
+                const { fhir_bundle, ...std } = currentScannedData;
+                content = JSON.stringify(std, null, 2);
+                filename = 'medical_data.json';
+            } else {
+                content = JSON.stringify(currentScannedData.fhir_bundle, null, 2);
+                filename = 'fhir_bundle.json';
+            }
+            const a = Object.assign(document.createElement('a'), {
+                href: URL.createObjectURL(new Blob([content], { type: 'application/json' })),
+                download: filename
+            });
+            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+        }
+
+        // ── RENDER ──
+        function renderResults(data) {
+            const meta = data.metadata || {};
+            const items = data.extracted_data || [];
+            const overall = calcOverallAccuracy(items);
+            const docType = (data.classification || {}).type || 'Unknown';
+            const summary = data.summary || '';
+
+            let html = '';
+
+            // 1. PIPELINE STEPS
+            html += `
+            <div class="result-card" style="padding:16px;">
+                <p style="font-size:0.75rem;font-weight:600;color:var(--text-sub);margin-bottom:8px;text-transform:uppercase;letter-spacing:.05em;">Processing Pipeline</p>
+                <div class="pipeline">
+                    <div class="step done">📥 Image Ingested</div>
+                    <span class="arrow">→</span>
+                    <div class="step done">🔍 OCR Extraction</div>
+                    <span class="arrow">→</span>
+                    <div class="step done">🧩 Structuring</div>
+                    <span class="arrow">→</span>
+                    <div class="step done">📊 Scored</div>
+                    <span class="arrow">→</span>
+                    <div class="step done">📄 Digital Copy</div>
+                </div>
+            </div>`;
+
+            // 2. OVERALL ACCURACY BANNER
+            if (overall !== null) {
+                const barWidth = Math.min(parseFloat(overall), 100);
+                const color = barWidth >= 90 ? '#059669' : barWidth >= 70 ? '#d97706' : '#dc2626';
+                html += `
+                <div class="accuracy-banner">
+                    <p style="font-size:0.8rem;opacity:0.7;margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em;">Overall Extraction Accuracy</p>
+                    <div class="accuracy-value">${overall}%</div>
+                    <div class="accuracy-bar-wrap"><div class="accuracy-bar-fill" style="width:${barWidth}%;background:linear-gradient(90deg,${color},${color}cc)"></div></div>
+                    <p style="font-size:0.75rem;opacity:0.6;margin-top:4px;">Average of ${items.length} extracted field${items.length !== 1 ? 's' : ''} · Real-time computed</p>
+                </div>`;
+            }
+
+            // 3. RAW OCR OUTPUT
+            html += `
+            <div class="result-card" style="border-left:4px solid var(--primary);background:#f8fafc;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                    <h3 style="margin:0;font-size:1rem;">🔍 Raw AI OCR Output</h3>
+                    <span class="tag" style="background:#cbd5e1;color:#334155;">Gemini Vision AI</span>
+                </div>
+                <p style="font-size:0.82rem;color:var(--text-sub);margin-bottom:10px;">Verbatim text extracted from the document before any structuring or standardization.</p>
+                <div style="background:#e2e8f0;padding:12px;border-radius:6px;font-family:monospace;font-size:0.8rem;color:#334155;max-height:160px;overflow-y:auto;white-space:pre-wrap;">${data.raw_ocr_output || 'No readable text extracted.'}</div>
+            </div>`;
+
+            // 4. CLASSIFICATION + SUMMARY
+            html += `
+            <div class="result-card">
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                    <h2 style="font-size:1.1rem;">${docType}</h2>
+                    <span class="tag high">${(data.classification || {}).confidence || ''} Confidence</span>
+                </div>
+                <p style="margin-top:10px;color:var(--text-sub);font-style:italic;">"${summary}"</p>
+            </div>`;
+
+            // 5. METADATA
+            html += `
+            <div class="result-card">
+                <h3>📋 Patient &amp; Doctor Details</h3>
+                <div class="meta-grid">
+                    <div class="meta-item"><label>Patient Name</label><span>${meta.patient_name || 'Not Detected'}</span></div>
+                    <div class="meta-item"><label>Doctor Name</label><span>${meta.doctor_name || 'Not Detected'}</span></div>
+                    <div class="meta-item"><label>Date</label><span>${meta.document_date || 'Not Detected'}</span></div>
+                    <div class="meta-item"><label>Center / Hospital</label><span>${meta.medical_center || 'Not Detected'}</span></div>
+                </div>
+            </div>`;
+
+            // 6. LOOKALIKE DIGITAL COPY
+            html += `
+            <div class="result-card" style="background:#fdfdfd;border:1px solid #e5e7eb;font-family:monospace;">
+                <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #000;padding-bottom:10px;margin-bottom:20px;">
+                    <h3 style="font-family:'Inter',sans-serif;">📄 Lookalike Digital Copy</h3>
+                    ${overall !== null ? `<span class="tag high" style="background:#d1fae5;color:#065f46;font-size:0.85rem;">Accuracy: ${overall}%</span>` : ''}
+                </div>
+                <div style="display:flex;justify-content:space-between;margin-bottom:20px;">
+                    <div><strong>Patient:</strong> ${meta.patient_name || '---'}<br><strong>Date:</strong> ${meta.document_date || '---'}</div>
+                    <div style="text-align:right;"><strong>Dr.</strong> ${meta.doctor_name || '---'}<br>${meta.medical_center || '---'}</div>
+                </div>
+                <div style="border-top:1px dashed #ccc;padding-top:20px;">
+                    ${items.length > 0 ? items.map(item => `
+                        <div style="display:flex;justify-content:space-between;margin-bottom:10px;padding-bottom:5px;border-bottom:1px solid #eee;">
+                            <div style="flex:2"><strong>${item.item_name}</strong></div>
+                            <div style="flex:1">${item.value || ''}</div>
+                            <div style="flex:1;text-align:right">${item.unit_or_frequency || ''}</div>
+                        </div>`).join('') : '<p>No items found.</p>'}
+                </div>
+            </div>`;
+
+            // 7. EXTRACTED DATA TABLE WITH INDIVIDUAL CONFIDENCE
+            html += `<div class="result-card"><h3>💊 Extracted &amp; Structured Data</h3>`;
+            if (items.length > 0) {
+                html += `<table class="data-table"><thead><tr><th>Item</th><th>Value</th><th>Unit / Frequency</th><th>AI Confidence</th></tr></thead><tbody>`;
+                items.forEach(item => {
+                    const conf = parseConfidence(item.confidence_score);
+                    const barC = conf >= 90 ? '#059669' : conf >= 70 ? '#d97706' : '#dc2626';
+                    html += `<tr>
+                        <td><strong>${item.item_name}</strong><br><span style="font-size:0.75rem;color:#64748b;">${item.category || ''}</span></td>
+                        <td>${item.value || '-'}</td>
+                        <td>${item.unit_or_frequency || '-'}</td>
+                        <td>
+                            <span class="tag high" style="background:#d1fae5;color:#065f46;">${item.confidence_score || '–'}</span>
+                            <div style="background:#e2e8f0;border-radius:4px;height:4px;width:60px;margin-top:4px;">
+                                <div style="height:4px;border-radius:4px;width:${Math.min(conf || 0, 100)}%;background:${barC}"></div>
+                            </div>
+                        </td>
+                    </tr>`;
+                });
+                html += `</tbody></table>`;
+            } else {
+                html += `<p style="color:var(--text-sub);padding:10px;">No structured items found.</p>`;
+            }
+            html += `</div>`;
+
+            // 8. SCHEMA CARD
+            html += `
+            <div class="result-card">
+                <h3>📋 Extraction Schema (Enforced)</h3>
+                <p style="font-size:0.85rem;color:var(--text-sub);margin-bottom:10px;">Every extraction must conform to this strict JSON schema.</p>
+                <div style="background:#1e293b;color:#cbd5e1;padding:15px;border-radius:8px;overflow-x:auto;font-size:0.78rem;">
+<pre><code>{
+  "metadata": { "patient_name", "doctor_name", "medical_center", "document_date" },
+  "classification": { "type", "confidence": "High|Medium|Low" },
+  "extracted_data": [
+    { "item_name", "value", "unit_or_frequency", "category", "confidence_score" }
+  ],
+  "summary": "string",
+  "raw_ocr_output": "verbatim extracted text"
+}</code></pre>
+                </div>
+            </div>`;
+
+            // 9. EXPORT
+            const { fhir_bundle, ...stdJson } = data;
+            html += `
+            <div class="result-card">
+                <h3>💾 Export Data</h3>
+                <div class="btn-group" style="grid-template-columns:1fr 1fr;">
+                    <button class="btn" style="background:#334155;" onclick="toggleCode('json-view')">👁️ View JSON</button>
+                    <button class="btn" style="background:#0ea5e9;" onclick="downloadData('json')">⬇️ Download JSON</button>
+                    <button class="btn" style="background:#334155;" onclick="toggleCode('fhir-view')">👁️ View FHIR</button>
+                    <button class="btn" style="background:#0ea5e9;" onclick="downloadData('fhir')">⬇️ Download FHIR</button>
+                </div>
+                <div id="json-view" style="display:none;margin-top:15px;background:#1e293b;color:#cbd5e1;padding:15px;border-radius:8px;overflow-x:auto;font-size:0.78rem;">
+                    <pre><code>${JSON.stringify(stdJson, null, 2)}</code></pre>
+                </div>
+                <div id="fhir-view" style="display:none;margin-top:15px;background:#1e293b;color:#cbd5e1;padding:15px;border-radius:8px;overflow-x:auto;font-size:0.78rem;">
+                    <pre><code>${JSON.stringify(fhir_bundle, null, 2)}</code></pre>
+                </div>
+            </div>`;
+
+            resultsArea.innerHTML = html;
+            resultsArea.style.display = 'block';
+            resultsArea.scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+
+</html>
