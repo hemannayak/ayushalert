@@ -32,8 +32,8 @@ export async function POST(req) {
     distance = Math.sqrt(distance);
     console.log(`[FaceID] Patient: ${patient_id} | Distance: ${distance}`);
 
-    // Strict Euclidean distance threshold for identical person (0.6 limit based on face-api standard)
-    if (distance > 0.6) {
+    // Strict Euclidean distance threshold for identical person (0.65 limit accommodates minor webcam noise)
+    if (distance > 0.65) {
       return NextResponse.json({ error: `Face mismatch. Distance: ${distance.toFixed(3)}` }, { status: 401 });
     }
 
