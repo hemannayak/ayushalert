@@ -147,7 +147,15 @@ async function visionAPI(imageUrl) {
   try {
     // Fetch direct file buffer. Let Cloudinary serve the original PDF or Image.
     const imgRes = await fetch(imageUrl);
-    const contentType = imgRes.headers.get('content-type') || (imageUrl.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
+    
+    // Strictly map extension to exact MIME type so Gemini's inline_data validation doesn't crash on PNG/JPG
+    const lowerUrl = imageUrl.toLowerCase();
+    let contentType = 'image/jpeg';
+    if (lowerUrl.includes('.pdf')) contentType = 'application/pdf';
+    if (lowerUrl.includes('.png')) contentType = 'image/png';
+    if (lowerUrl.includes('.webp')) contentType = 'image/webp';
+    if (lowerUrl.includes('.heic') || lowerUrl.includes('.heif')) contentType = 'image/heic';
+
     const buffer = await imgRes.arrayBuffer();
     const base64Data = Buffer.from(buffer).toString('base64');
 
