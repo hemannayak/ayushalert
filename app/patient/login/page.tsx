@@ -9,6 +9,7 @@ export default function Login() {
   const [patientId, setPatientId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   
   // Login Method Toggle
   const [loginMethod, setLoginMethod] = useState<'face' | 'otp'>('face');
@@ -77,9 +78,11 @@ export default function Login() {
                   if (timeRemaining <= 0) {
                       clearInterval(countdownInterval);
                       setCountdown(null);
+                      setLoading(true); // Prevent race condition by immediately freezing scanner
                       
                       if (!videoRef.current) {
                           setError("Camera not found.");
+                          setLoading(false);
                           return;
                       }
                       
@@ -129,7 +132,12 @@ export default function Login() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('patient_id', data.patient_id);
       
-      router.push('/patient/dashboard');
+      setSuccess('Biometric Access Verified. Entering portal...');
+      
+      setTimeout(() => {
+         router.push('/patient/dashboard');
+      }, 1500);
+      
     } catch (err: any) {
       console.error(err);
       setError(err.message || "An unexpected error occurred");
@@ -195,6 +203,7 @@ export default function Login() {
         </div>
       
         {error && <div className="bg-red-900/40 border border-red-500/50 text-red-200 p-3 rounded-lg mb-6 text-sm font-medium">{error}</div>}
+        {success && <div className="bg-emerald-900/40 border border-emerald-500/50 text-emerald-300 p-3 rounded-lg mb-6 text-sm font-semibold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.2)]"><div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>{success}</div>}
       
       <div className="space-y-4">
         <div className="mb-6">
