@@ -34,6 +34,7 @@ export default function PatientNav() {
       </div>
 
       <nav className="flex-1 px-4 py-6 flex flex-row md:flex-col gap-2 overflow-x-auto md:overflow-x-visible">
+        <NavLink href="/" current={pathname} icon="🏠">Home</NavLink>
         <NavLink href="/patient/dashboard" current={pathname} icon="📊">Dashboard</NavLink>
         <NavLink href="/patient/profile" current={pathname} icon="🧬">My Identity</NavLink>
         <NavLink href="/patient/records" current={pathname} icon="📚">Health Atlas</NavLink>

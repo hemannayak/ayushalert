@@ -23,16 +23,25 @@ export async function POST(req) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    const token = signToken({ hospital_id: hospital.hospital_id, email: hospital.admin_email, role: 'hospital' });
+    const token = signToken({
+      hospital_id: hospital.hospital_id,
+      email:       hospital.admin_email,
+      role:        'hospital'
+    });
 
     return NextResponse.json({
       token,
-      hospital_id: hospital.hospital_id,
-      name: hospital.name
+      hospital_id:  hospital.hospital_id,
+      name:         hospital.name,
+      city:         hospital.city,
+      logo_url:     hospital.logo_url || '',
+      status:       hospital.status,
+      api_key:      hospital.status === 'verified' ? hospital.api_key : null,
+      verified_at:  hospital.verified_at,
     }, { status: 200 });
 
   } catch (error) {
-    console.error('Hospital Login error:', error);
+    console.error('[Hospital Login] Error:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

@@ -89,7 +89,7 @@ export default function Home() {
                  Authoritative EHR ingestion. Push verified lab results, JSON FHIR bundles, and diagnosis trees directly to timelines.
               </p>
               <div className="flex flex-col w-full mt-auto">
-                 <Link href="/hospital/mock-portal" className="w-full py-2.5 bg-zinc-100 hover:bg-white text-black font-medium text-xs text-center rounded-lg transition-colors">
+                 <Link href="/hospital/portal" className="w-full py-2.5 bg-zinc-100 hover:bg-white text-black font-medium text-xs text-center rounded-lg transition-colors">
                     EHR Simulator
                  </Link>
               </div>

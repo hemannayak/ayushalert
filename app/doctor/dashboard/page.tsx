@@ -230,9 +230,17 @@ export default function DoctorDashboard() {
            </h1>
            <p className="text-zinc-400 text-sm mt-2 font-mono">Authenticated Node: <span className="text-zinc-300 bg-zinc-900/50 px-2 py-0.5 rounded">{doctorId}</span></p>
         </div>
-        <button onClick={handleLogout} className="relative z-10 bg-zinc-900/80 border border-zinc-700/80 hover:bg-zinc-800 text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition shadow-inner">
-           Terminate Session
-        </button>
+         <div className="flex items-center gap-3 relative z-10">
+           <button onClick={() => router.push('/')} className="bg-zinc-900/80 border border-zinc-700/80 hover:bg-zinc-800 text-zinc-400 hover:text-white font-semibold px-5 py-2.5 rounded-lg text-sm transition shadow-inner flex items-center gap-2">
+             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+               <path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+             </svg>
+             Home
+           </button>
+           <button onClick={handleLogout} className="bg-zinc-900/80 border border-zinc-700/80 hover:bg-zinc-800 text-white font-semibold px-6 py-2.5 rounded-lg text-sm transition shadow-inner">
+              Terminate Session
+           </button>
+         </div>
       </div>
 
       {/* STEP 1: SCAN PATIENT OR ENTER ID */}

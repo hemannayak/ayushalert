@@ -186,6 +186,12 @@ export default function DoctorLogin() {
 
   return (
     <div className="max-w-md mx-auto bg-zinc-900/80 backdrop-blur-xl p-8 rounded-2xl shadow-2xl mt-20 border border-zinc-800/80 shadow-emerald-500/5">
+      <div className="flex items-center justify-between mb-4">
+        <Link href="/" className="flex items-center gap-1.5 text-xs font-bold text-zinc-500 hover:text-white transition uppercase tracking-widest">
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
+          Home
+        </Link>
+      </div>
       <h2 className="text-2xl font-extrabold mb-6 text-center text-white">Doctor Secure Login</h2>
       
       {error && <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg mb-4 text-sm font-semibold">{error}</div>}
