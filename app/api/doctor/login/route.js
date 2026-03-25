@@ -25,13 +25,14 @@ export async function POST(req) {
     // Calculate Euclidean Distance
     let distance = 0;
     for (let i = 0; i < face_embedding.length; i++) {
-        distance += Math.pow(face_embedding[i] - storedFace[i], 2);
+        distance += Math.pow((face_embedding[i] || 0) - (storedFace[i] || 0), 2);
     }
     distance = Math.sqrt(distance);
+    console.log(`[FaceID] Doctor: ${doctor_id} | Distance: ${distance}`);
 
-    // Using 0.65 threshold to match patient fallback for stable demo performance
-    if (distance > 0.65) {
-      return NextResponse.json({ error: 'Face mismatch. Access Denied.' }, { status: 401 });
+    // Strict Euclidean distance threshold for identical person (0.6 limit based on face-api standard)
+    if (distance > 0.6) {
+      return NextResponse.json({ error: `Face mismatch. Distance: ${distance.toFixed(3)}` }, { status: 401 });
     }
 
     const token = signToken({ doctor_id: doctor.doctor_id, email: doctor.email, role: 'doctor' });
