@@ -291,9 +291,15 @@ export default function Login() {
                    <button onClick={verifyOtp} disabled={loading || otp.length < 6} className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.3)] transition disabled:opacity-50">
                       {loading ? 'Verifying signature...' : 'Verify & Enter'}
                    </button>
-                   <button onClick={() => { setOtpSent(false); setOtp(''); }} className="text-sm text-zinc-500 font-medium hover:text-white transition mt-2">
-                      Use a different Patient ID
-                   </button>
+                   <div className="flex justify-between items-center w-full pt-2 px-1">
+                      <button onClick={requestOtp} disabled={loading} className="text-xs text-indigo-400 font-bold hover:text-indigo-300 transition uppercase tracking-widest flex items-center gap-1">
+                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
+                         Resend
+                      </button>
+                      <button onClick={() => { setOtpSent(false); setOtp(''); }} disabled={loading} className="text-xs text-zinc-500 font-bold hover:text-white transition uppercase tracking-widest text-right">
+                         Change ID
+                      </button>
+                   </div>
                 </div>
              )}
           </div>

@@ -92,7 +92,7 @@ export async function PUT(req) {
     await doctor.save();
 
     // Generate JWT
-    const token = generateToken({
+    const token = signToken({
       doctor_id: doctor.doctor_id,
       name: doctor.name,
       hospital_id: doctor.hospital_id,
