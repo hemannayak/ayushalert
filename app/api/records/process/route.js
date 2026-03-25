@@ -145,11 +145,16 @@ async function visionAPI(imageUrl) {
   if (!apiKey) throw new Error('GEMINI_API_KEY is missing.');
 
   try {
-    // Fetch direct file buffer. Let Cloudinary serve the original PDF or Image.
-    const imgRes = await fetch(imageUrl);
+    // Force Cloudinary to dynamically rasterize PDFs to JPGs to prevent Gemini inline_data hanging
+    let urlToProcess = imageUrl;
+    if (urlToProcess.toLowerCase().endsWith('.pdf')) {
+        urlToProcess = urlToProcess.replace(/\.pdf$/i, '.jpg');
+    }
+
+    const imgRes = await fetch(urlToProcess);
     
-    // Strictly map extension to exact MIME type so Gemini's inline_data validation doesn't crash on PNG/JPG
-    const lowerUrl = imageUrl.toLowerCase();
+    // Strictly map extension to exact MIME type so Gemini's inline_data validation doesn't crash
+    const lowerUrl = urlToProcess.toLowerCase();
     let contentType = 'image/jpeg';
     if (lowerUrl.includes('.pdf')) contentType = 'application/pdf';
     if (lowerUrl.includes('.png')) contentType = 'image/png';
@@ -191,19 +196,19 @@ async function visionAPI(imageUrl) {
             { text: prompt },
             { inline_data: { mime_type: contentType, data: base64Data } }
           ]
-        }],
-        generationConfig: {
-          response_mime_type: "application/json"
-        }
+        }]
       }),
-      signal: AbortSignal.timeout(20000) // 20 seconds strict timeout to prevent infinite UI loading
+      signal: AbortSignal.timeout(60000) // 60 seconds — Gemini 2.5 uses thinking mode and needs more time
     });
 
     const data = await genAiRes.json();
     if (data.error) throw new Error(data.error.message);
     
-    const textOutput = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    let textOutput = data?.candidates?.[0]?.content?.parts?.[0]?.text;
     if (!textOutput) throw new Error("Gemini returned empty response.");
+    
+    // Gemini 2.5 wraps JSON in markdown code fences — strip them if present
+    textOutput = textOutput.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
     
     const parsed = JSON.parse(textOutput);
     
