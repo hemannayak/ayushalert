@@ -9,11 +9,11 @@ import { anonymizeAndStore } from '../../../../lib/anonymizer.js';
 // FALLBACK: Predefined structured data if OCR/NLP fails
 // ─────────────────────────────────────────────────────────────
 const FALLBACK_STRUCTURED = {
-  medicines: ['Paracetamol 500mg', 'Azithromycin 250mg'],
-  dosage:    ['Paracetamol: 1 tablet twice daily', 'Azithromycin: 1 tablet once daily for 5 days'],
-  symptoms:  ['Fever', 'Sore throat', 'Cough'],
-  diagnosis: ['Viral Upper Respiratory Tract Infection'],
-  doctor:    'Dr. [Extracted from document]',
+  medicines: [],
+  dosage:    [],
+  symptoms:  ['AI Extraction Failed - System Overload or Invalid File'],
+  diagnosis: ['Unknown (Manual Review Required)'],
+  doctor:    'Unknown',
   date:      new Date().toISOString().split('T')[0],
   _fallback: true
 };
@@ -145,14 +145,9 @@ async function visionAPI(imageUrl) {
   if (!apiKey) throw new Error('GEMINI_API_KEY is missing.');
 
   try {
-    // Force Cloudinary to dynamically rasterize PDFs to JPGs to prevent Gemini inline_data hanging
-    let urlToProcess = imageUrl;
-    if (urlToProcess.toLowerCase().endsWith('.pdf')) {
-        urlToProcess = urlToProcess.replace(/\.pdf$/i, '.jpg');
-    }
-
-    const imgRes = await fetch(urlToProcess);
-    const contentType = imgRes.headers.get('content-type') || 'image/jpeg';
+    // Fetch direct file buffer. Let Cloudinary serve the original PDF or Image.
+    const imgRes = await fetch(imageUrl);
+    const contentType = imgRes.headers.get('content-type') || (imageUrl.toLowerCase().endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
     const buffer = await imgRes.arrayBuffer();
     const base64Data = Buffer.from(buffer).toString('base64');
 
