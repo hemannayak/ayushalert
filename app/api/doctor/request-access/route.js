@@ -10,14 +10,21 @@ export async function POST(req) {
   try {
     const authHeader = req.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      console.error('[Auth Error] Missing or invalid Authorization header');
+      return NextResponse.json({ error: 'Unauthorized: Missing token' }, { status: 401 });
     }
 
     const token = authHeader.split(' ')[1];
     const decoded = verifyToken(token);
 
-    if (!decoded || !decoded.doctor_id) {
+    if (!decoded) {
+      console.error('[Auth Error] Token verification failed (invalid or expired)');
       return NextResponse.json({ error: 'Invalid or expired doctor token' }, { status: 401 });
+    }
+
+    if (!decoded.doctor_id) {
+      console.error('[Auth Error] Token valid but missing doctor_id. Payload:', decoded);
+      return NextResponse.json({ error: 'Unauthorized: Not a doctor token' }, { status: 401 });
     }
 
     const { patient_id } = await req.json();

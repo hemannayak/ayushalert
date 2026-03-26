@@ -37,10 +37,29 @@ export default function Dashboard() {
     fetchProfile();
   }, [router]);
 
-  if (loading) return <div className="text-center mt-20">Loading...</div>;
+  if (loading) return <div className="text-center mt-20 text-zinc-500 animate-pulse">Establishing secure link...</div>;
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    router.push('/patient/login');
+  };
 
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+      {/* GLOBAL NAV */}
+      <nav className="border-b border-white/5 bg-zinc-950/50 backdrop-blur-xl sticky top-0 z-40 -mx-4 px-4 py-4 mb-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
+          <div className="flex items-center gap-2 group cursor-pointer" onClick={() => router.push('/')}>
+             <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold group-hover:scale-105 transition-transform">A</div>
+             <span className="font-bold text-zinc-100 tracking-tight">AyushAlert</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <button onClick={() => router.push('/')} className="text-xs font-bold text-zinc-400 hover:text-white transition uppercase tracking-widest px-3 py-1">Home</button>
+            <button onClick={handleLogout} className="text-xs font-bold bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-4 py-1.5 rounded-full border border-zinc-700 transition">Logout</button>
+          </div>
+        </div>
+      </nav>
+
       <header className="glass-panel p-8 md:p-10 border-l-4 border-l-indigo-500 relative">
         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/10 blur-[80px] rounded-full pointer-events-none" />
         <h1 className="text-3xl md:text-5xl font-extrabold text-white tracking-tight mb-2">

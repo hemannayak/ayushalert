@@ -8,8 +8,12 @@ export function signToken(payload) {
 
 export function verifyToken(token) {
   try {
+    if (!process.env.JWT_SECRET) {
+      console.warn('[JWT] Warning: JWT_SECRET is not defined in environment. Using fallback.');
+    }
     return jwt.verify(token, process.env.JWT_SECRET || 'fallback_secret');
   } catch (error) {
+    console.error('[JWT] Verification failed:', error.message);
     return null;
   }
 }

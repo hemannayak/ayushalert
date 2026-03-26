@@ -116,7 +116,7 @@ export default function DoctorRegister() {
 
       if (!res.ok) throw new Error(data.error || 'Registration failed');
 
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('doctor_token', data.token);
       localStorage.setItem('doctor_id', data.doctor_id);
       
       router.push('/doctor/dashboard');

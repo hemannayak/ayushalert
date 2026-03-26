@@ -27,9 +27,24 @@ export default function PatientRequests() {
         const res = await fetch('/api/patient/consent-requests', {
           headers: { Authorization: `Bearer ${token}` }
         });
-        if (!res.ok) throw new Error('Failed to load requests');
+        if (!res.ok) {
+          let errMsg = `Server error (${res.status})`;
+          try {
+            const errData = await res.json();
+            errMsg = errData.error || errMsg;
+          } catch {}
+          // If token is invalid/expired, redirect to login
+          if (res.status === 401) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('patient_id');
+            router.push('/patient/login');
+            return;
+          }
+          throw new Error(errMsg);
+        }
         const data = await res.json();
         setRequests(data);
+        if (!isPolling) setError(''); // clear any previous error on success
       } catch (err: any) {
         if (!isPolling) setError(err.message);
       } finally {
@@ -47,16 +62,33 @@ export default function PatientRequests() {
 
   if (!mounted) return null;
 
-  if (loading) return <div className="text-center mt-20 text-gray-500">Loading consent requests...</div>;
+  if (loading) return (
+    <div className="flex items-center justify-center mt-24 gap-3 text-zinc-400">
+      <div className="w-5 h-5 border-2 border-zinc-600 border-t-zinc-300 rounded-full animate-spin" />
+      <span className="text-sm font-medium">Loading consent requests...</span>
+    </div>
+  );
 
   return (
     <div className="max-w-3xl mx-auto mt-10 space-y-4">
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-2xl font-bold text-gray-800">🔐 Consent Requests</h1>
-        <button onClick={() => router.push('/patient/dashboard')} className="text-sm text-blue-600 hover:underline">← Dashboard</button>
+        <h1 className="text-2xl font-bold text-zinc-100">🔒 Consent Requests</h1>
+        <button onClick={() => router.push('/patient/dashboard')} className="text-sm text-indigo-400 hover:text-indigo-300 transition">← Dashboard</button>
       </div>
 
-      {error && <div className="bg-red-100 text-red-700 p-3 rounded text-sm">{error}</div>}
+      {error && (
+        <div className="bg-red-900/20 border border-red-800/50 text-red-300 p-4 rounded-xl text-sm flex flex-col gap-3">
+          <p className="font-semibold">{error}</p>
+          <div className="flex gap-3">
+            <button onClick={() => window.location.reload()} className="text-xs font-bold bg-red-900/30 hover:bg-red-900/50 border border-red-800/50 text-red-300 px-3 py-1.5 rounded-lg transition">
+              Retry
+            </button>
+            <button onClick={() => router.push('/patient/login')} className="text-xs font-bold bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 px-3 py-1.5 rounded-lg transition">
+              Re-login
+            </button>
+          </div>
+        </div>
+      )}
 
       {requests.length === 0 && !error && (
         <div className="bg-white p-8 rounded-xl shadow text-center text-gray-400">

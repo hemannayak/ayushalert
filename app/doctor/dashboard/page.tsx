@@ -29,7 +29,9 @@ export default function DoctorDashboard() {
 
   useEffect(() => {
     const dId = localStorage.getItem('doctor_id');
-    if (!dId) {
+    const token = localStorage.getItem('doctor_token');
+    
+    if (!dId || !token) {
       router.push('/doctor/login');
       return;
     }
@@ -130,7 +132,7 @@ export default function DoctorDashboard() {
     // Triggers the real API to create a consent request in MongoDB
     const handleRequestAccess = async (pid: string) => {
         if (!pid.trim()) return;
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem('doctor_token');
         try {
             const res = await fetch('/api/doctor/request-access', {
                 method: 'POST',
@@ -155,7 +157,7 @@ export default function DoctorDashboard() {
     useEffect(() => {
         let pollInterval: any;
         if (step === 2 && consentRequestId) {
-            const token = localStorage.getItem('token');
+            const token = localStorage.getItem('doctor_token');
             pollInterval = setInterval(async () => {
                 try {
                     const res = await fetch(`/api/doctor/check-consent?request_id=${consentRequestId}`, {
@@ -201,6 +203,7 @@ export default function DoctorDashboard() {
 
   const handleLogout = () => {
       localStorage.removeItem('doctor_id');
+      localStorage.removeItem('doctor_token');
       router.push('/doctor/login');
   };
 

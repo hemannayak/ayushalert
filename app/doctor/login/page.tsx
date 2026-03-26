@@ -126,7 +126,7 @@ export default function DoctorLogin() {
 
       if (!res.ok) throw new Error(data.error || 'Face Login failed');
 
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('doctor_token', data.token);
       localStorage.setItem('doctor_id', data.doctor_id);
       
       setSuccess('Biometric Signature Verified. Entering portal...');
@@ -175,7 +175,7 @@ export default function DoctorLogin() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Invalid OTP');
       
-      localStorage.setItem('token', data.token);
+      localStorage.setItem('doctor_token', data.token);
       localStorage.setItem('doctor_id', data.doctor_id);
       router.push('/doctor/dashboard');
     } catch (err: any) {
