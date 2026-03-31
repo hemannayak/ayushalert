@@ -3,6 +3,10 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import * as faceapi from 'face-api.js';
+import { motion, AnimatePresence } from 'framer-motion';
+import { BrandLogo } from '@/components/BrandLogo';
+import { ScannerOverlay } from '@/components/ScannerOverlay';
+import { Shield, Mail, ArrowLeft, Fingerprint, Activity } from 'lucide-react';
 
 export default function Login() {
   const router = useRouter();
@@ -189,143 +193,255 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden">
-      {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
-      
-      <div className="w-full max-w-md glass-panel p-10 z-10 border-t-4 border-t-indigo-500">
-        <div className="flex items-center justify-between mb-6">
-          <Link href="/" className="flex items-center gap-1.5 text-xs font-bold text-zinc-500 hover:text-white transition uppercase tracking-widest">
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-            Home
+    <div className="min-h-screen bg-zinc-950 flex flex-col lg:flex-row relative overflow-hidden">
+      {/* ── BACKGROUND MESH LAYER ────────────────────────────────────────── */}
+      <div className="absolute inset-0 opacity-[0.4] pointer-events-none select-none z-0">
+        <div className="absolute top-1/4 -right-1/4 w-[800px] h-[800px] bg-cyan-500/10 rounded-full blur-[160px]" />
+        <div className="absolute bottom-1/4 -left-1/4 w-[800px] h-[800px] bg-indigo-500/10 rounded-full blur-[160px]" />
+        <div 
+          className="absolute inset-0"
+          style={{ 
+            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.03) 1px, transparent 0)`,
+            backgroundSize: '40px 40px'
+          }}
+        />
+      </div>
+
+      {/* ── LEFT PANEL: THE PROTOCOL IDENTITY (DESKTOP ONLY) ───────────── */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-16 relative z-10 border-r border-white/5 overflow-hidden">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
+            <BrandLogo variant="horizontal" size={32} />
           </Link>
+        </motion.div>
+
+        <div className="space-y-8 max-w-lg">
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400"
+          >
+            <Shield size={12} strokeWidth={3} />
+            Sovereign Access Protocol
+          </motion.div>
+          
+          <motion.h1 
+            className="text-6xl font-black tracking-tighter leading-[0.85] text-white"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+          >
+            Authenticate <br /> 
+            <span className="text-zinc-600">Your Identity.</span>
+          </motion.h1>
+
+          <motion.p 
+            className="text-lg text-zinc-500 font-medium leading-relaxed"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            Access your unified health records via biometric orchestration or secure cryptographic tokens. Your data, your sovereignty.
+          </motion.p>
         </div>
-        <div className="text-center mb-8">
-           <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-3xl mx-auto mb-4 shadow-inner text-indigo-400">
-             👤
-           </div>
-           <h2 className="text-3xl font-bold tracking-tight text-white mb-2">Patient Security</h2>
-           <p className="text-zinc-400 text-sm">Authenticate your identity to access the portal.</p>
-        </div>
-      
-        {error && <div className="bg-red-900/40 border border-red-500/50 text-red-200 p-3 rounded-lg mb-6 text-sm font-medium">{error}</div>}
-        {success && <div className="bg-emerald-900/40 border border-emerald-500/50 text-emerald-300 p-3 rounded-lg mb-6 text-sm font-semibold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.2)]"><div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>{success}</div>}
-      
-      <div className="space-y-4">
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-zinc-300 mb-2">Patient ID</label>
-          <input 
-            required 
-            placeholder="PAT_..."
-            value={patientId}
-            type="text" 
-            onChange={(e) => setPatientId(e.target.value)} 
-            disabled={otpSent}
-            className="w-full bg-zinc-900/50 border border-zinc-700 rounded-xl p-4 text-white text-center text-lg font-mono focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 disabled:opacity-50 transition" 
-          />
-        </div>
 
-        {/* Method Toggle */}
-        {!otpSent && (
-        <div className="flex bg-zinc-900/80 p-1.5 rounded-xl border border-zinc-800 mb-6">
-           <button onClick={() => setLoginMethod('face')} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${loginMethod === 'face' ? 'bg-zinc-800/80 shadow-md text-indigo-400 border border-zinc-700' : 'text-zinc-500 hover:text-zinc-300'}`}>FaceID Scan</button>
-           <button onClick={() => { setLoginMethod('otp'); stopCamera(); }} className={`flex-1 py-2.5 text-sm font-bold rounded-lg transition-all ${loginMethod === 'otp' ? 'bg-zinc-800/80 shadow-md text-indigo-400 border border-zinc-700' : 'text-zinc-500 hover:text-zinc-300'}`}>Email Token</button>
-        </div>
-        )}
+        <motion.div 
+          className="flex items-center gap-12 pt-8"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          {[
+            { label: 'Latency', value: '42ms' },
+            { label: 'Integrity', value: 'Verified' },
+            { label: 'Security', value: 'AES-256' },
+          ].map((stat, i) => (
+            <div key={i} className="space-y-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">{stat.label}</p>
+              <p className="text-sm font-bold text-zinc-300 font-mono">{stat.value}</p>
+            </div>
+          ))}
+        </motion.div>
+        
+        {/* Subtle decorative grid in left panel */}
+        <div className="absolute -bottom-20 -left-20 w-96 h-96 border border-white/[0.03] rounded-full" />
+      </div>
 
-        {loginMethod === 'face' ? (
-        <div className="bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800 flex flex-col items-center min-h-[250px] justify-center relative overflow-hidden">
-            {!modelsLoaded && <p className="text-sm text-zinc-500 italic">Initializing Local AI Models...</p>}
-            
-            {modelsLoaded && !cameraActive && (
-                <button 
-                  onClick={startCamera} 
-                  disabled={!patientId.trim()}
-                  className="bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-white px-8 py-3 rounded-full font-semibold transition disabled:opacity-50 shadow-lg"
-                 >
-                  Initialize Camera
-                </button>
-            )}
+      {/* ── RIGHT PANEL: THE FUNCTIONAL TERMINAL ───────────────────────── */}
+      <div className="flex-1 flex flex-col justify-center items-center p-6 sm:p-12 lg:p-24 relative z-10 overflow-y-auto min-h-screen lg:min-h-0">
+        <div className="w-full max-w-[420px] space-y-10">
+          
+          {/* Mobile Logo Only */}
+          <div className="lg:hidden flex justify-center mb-8">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <BrandLogo variant="horizontal" size={32} />
+              <span className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black uppercase tracking-widest text-indigo-400">Institutional Hub</span>
+            </div>
+          </div>
 
-            <video 
-                ref={videoRef} 
-                autoPlay 
-                muted 
-                playsInline
-                className={`rounded-xl border border-indigo-500/30 object-cover shadow-2xl ${!cameraActive ? 'hidden' : ''}`}
-                style={{ width: '100%', height: '200px' }}
-            />
+          {/* Header */}
+          <div className="space-y-3">
+             <div className="flex items-center justify-between">
+                <h2 className="text-2xl font-bold tracking-tight text-white">Sovereign Point</h2>
+                <Link href="/" className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition flex items-center gap-2 group">
+                   <ArrowLeft size={12} className="group-hover:-translate-x-1 transition-transform" />
+                   Back
+                </Link>
+             </div>
+             <p className="text-zinc-500 text-sm font-medium">Verify your decentralized identifier to enter.</p>
+          </div>
 
-            {cameraActive && !loading && countdown === null && (
-                <div className="absolute bottom-4 bg-zinc-900/80 backdrop-blur px-4 py-2 rounded-full border border-zinc-700">
-                  <p className="text-xs font-semibold text-indigo-400 animate-pulse">
-                    Scanning geometry... Please look directly forward.
-                  </p>
-                </div>
-            )}
+          <AnimatePresence mode="wait">
+            <motion.div 
+              key="login-form-container"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              className="space-y-8"
+            >
+              {/* Alert Area */}
+              {(error || success) && (
+                <motion.div 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className={`p-4 rounded-xl border text-xs font-bold flex items-center gap-3 ${
+                    error ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                  }`}
+                >
+                  <div className={`w-2 h-2 rounded-full shrink-0 ${error ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500 animate-pulse'}`} />
+                  {error || success}
+                </motion.div>
+              )}
 
-            {countdown !== null && (
-                <div className="absolute inset-0 bg-indigo-900/40 backdrop-blur-sm flex items-center justify-center flex-col z-10">
-                  <p className="text-sm font-bold text-white mb-2">Biometrics Acquired</p>
-                  <div className="text-5xl font-black text-white drop-shadow-[0_0_15px_rgba(79,70,229,0.8)] animate-bounce">
-                    {countdown}
+              {/* ID INPUT */}
+              <div className="space-y-4">
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-cyan-500/5 blur-xl group-focus-within:bg-cyan-500/10 transition-colors" />
+                  <div className="relative">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 block mb-2 px-1">Patient Identity Identifier (PII)</label>
+                    <input 
+                      required 
+                      placeholder="PAT_••••••••"
+                      value={patientId}
+                      type="text" 
+                      onChange={(e) => setPatientId(e.target.value)} 
+                      disabled={otpSent || loading}
+                      className="w-full bg-zinc-900/50 border border-zinc-800 rounded-2xl p-5 text-white text-center text-xl font-mono tracking-widest focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 outline-none disabled:opacity-50 transition shadow-2xl" 
+                    />
                   </div>
                 </div>
-            )}
 
-            {loading && (
-                <div className="absolute inset-0 bg-zinc-900/80 backdrop-blur-sm flex items-center justify-center z-10">
-                  <p className="text-sm font-bold text-indigo-400 animate-pulse bg-zinc-800 px-6 py-2 rounded-full border border-zinc-700">
-                    Authenticating Match...
-                  </p>
-                </div>
-            )}
-        </div>
-        ) : (
-          <div className="bg-zinc-900/50 p-8 rounded-2xl border border-zinc-800 text-center">
-             {!otpSent ? (
-                <div>
-                   <p className="text-sm text-zinc-400 mb-6 leading-relaxed">A secure 6-digit cryptographic token will be dispatched to your registered email.</p>
-                   <button onClick={requestOtp} disabled={loading || !patientId.trim()} className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3.5 rounded-xl shadow-[0_0_15px_rgba(79,70,229,0.3)] transition disabled:opacity-50">
-                      {loading ? 'Transmitting...' : 'Request Auth Token'}
-                   </button>
-                </div>
-             ) : (
-                <div className="space-y-6">
-                   <div className="bg-emerald-900/30 border border-emerald-500/30 text-emerald-300 p-3 rounded-lg text-xs font-semibold">
-                      ✅ Token securely transmitted.
-                   </div>
-                   <input
-                     type="text"
-                     placeholder="000000"
-                     value={otp}
-                     onChange={e => setOtp(e.target.value)}
-                     className="w-full bg-zinc-950 border border-zinc-700 rounded-xl px-4 py-4 text-center text-white font-mono text-3xl tracking-[0.5em] focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition"
-                     maxLength={6}
-                   />
-                   <button onClick={verifyOtp} disabled={loading || otp.length < 6} className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3.5 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.3)] transition disabled:opacity-50">
-                      {loading ? 'Verifying signature...' : 'Verify & Enter'}
-                   </button>
-                   <div className="flex justify-between items-center w-full pt-2 px-1">
-                      <button onClick={requestOtp} disabled={loading} className="text-xs text-indigo-400 font-bold hover:text-indigo-300 transition uppercase tracking-widest flex items-center gap-1">
-                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                         Resend
+                {/* Method Toggle */}
+                {!otpSent && (
+                  <div className="flex bg-zinc-900/80 p-1.5 rounded-2xl border border-zinc-800/80 shadow-inner">
+                    <button onClick={() => setLoginMethod('face')} className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${loginMethod === 'face' ? 'bg-zinc-800 text-cyan-400 shadow-xl border border-white/5' : 'text-zinc-500 hover:text-zinc-300'}`}>
+                      <Fingerprint size={14} /> Biometrics
+                    </button>
+                    <button onClick={() => { setLoginMethod('otp'); stopCamera(); }} className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${loginMethod === 'otp' ? 'bg-zinc-800 text-cyan-400 shadow-xl border border-white/5' : 'text-zinc-500 hover:text-zinc-300'}`}>
+                      <Mail size={14} /> Auth Token
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* AUTHENTICATION AREA */}
+              <div className="relative">
+                {loginMethod === 'face' ? (
+                  <div className="aspect-video w-full bg-zinc-900/50 rounded-2xl border border-zinc-800/80 flex flex-col items-center justify-center relative overflow-hidden shadow-2xl group">
+                    {!modelsLoaded && (
+                      <div className="flex flex-col items-center gap-3">
+                        <Activity className="text-cyan-500/40 animate-pulse" size={32} />
+                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Local Neural Engine Calibrating...</p>
+                      </div>
+                    )}
+                    
+                    {modelsLoaded && !cameraActive && (
+                      <button 
+                        onClick={startCamera} 
+                        disabled={!patientId.trim()}
+                        className="relative z-30 group/btn h-14 w-14 rounded-full bg-cyan-500 text-zinc-950 flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:grayscale disabled:opacity-30 disabled:scale-100 shadow-[0_0_30px_rgba(34,211,238,0.4)]"
+                      >
+                        <Fingerprint size={28} className="group-hover/btn:animate-pulse" />
                       </button>
-                      <button onClick={() => { setOtpSent(false); setOtp(''); }} disabled={loading} className="text-xs text-zinc-500 font-bold hover:text-white transition uppercase tracking-widest text-right">
-                         Change ID
-                      </button>
-                   </div>
-                </div>
-             )}
+                    )}
+
+                    <video 
+                      ref={videoRef} 
+                      autoPlay 
+                      muted 
+                      playsInline
+                      className={`w-full h-full object-cover transition-opacity duration-700 ${!cameraActive ? 'opacity-0' : 'opacity-100'}`}
+                    />
+
+                    {cameraActive && (
+                      <ScannerOverlay 
+                        status={loading ? 'verifying' : countdown !== null ? 'verifying' : 'scanning'}
+                        countdown={countdown}
+                        label={loading ? "Verifying Signature" : countdown !== null ? "Geometry Fixed" : "Live Scan: Active"} 
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <motion.div 
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    className="p-8 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 text-center space-y-6 shadow-2xl"
+                  >
+                    {!otpSent ? (
+                      <div className="space-y-6">
+                        <p className="text-xs text-zinc-500 font-medium leading-relaxed uppercase tracking-wide">A unique 6-digit cryptographic token will be dispatched to your decentralized repository contact.</p>
+                        <button 
+                          onClick={requestOtp} 
+                          disabled={loading || !patientId.trim()} 
+                          className="w-full bg-white text-zinc-950 h-14 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-zinc-200 transition-all disabled:opacity-50 shadow-[0_0_30px_rgba(255,255,255,0.1)] active:scale-[0.98]"
+                        >
+                          {loading ? 'Transmitting...' : 'Dispatch Protocol Token'}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-10">
+                        <input
+                          type="text"
+                          placeholder="000000"
+                          value={otp}
+                          onChange={e => setOtp(e.target.value)}
+                          className="w-full bg-transparent border-b-4 border-zinc-800 text-center text-white font-mono text-5xl tracking-[0.4em] outline-none focus:border-cyan-500 focus:text-cyan-400 transition-all placeholder-zinc-800"
+                          maxLength={6}
+                        />
+                        <button 
+                          onClick={verifyOtp} 
+                          disabled={loading || otp.length < 6} 
+                          className="w-full bg-cyan-500 text-zinc-950 h-14 rounded-2xl font-black text-xs uppercase tracking-widest hover:opacity-90 transition-all disabled:opacity-50 shadow-[0_0_30px_rgba(34,211,238,0.3)] active:scale-[0.98]"
+                        >
+                          {loading ? 'Verifying Integrity...' : 'Establish Handshake'}
+                        </button>
+                        
+                        <div className="flex justify-between items-center w-full px-2">
+                          <button onClick={requestOtp} disabled={loading} className="text-[10px] font-black text-zinc-500 uppercase tracking-widest hover:text-white transition">Resend</button>
+                          <button onClick={() => { setOtpSent(false); setOtp(''); }} disabled={loading} className="text-[10px] font-black text-zinc-500 uppercase tracking-widest hover:text-white transition">Reset Identifier</button>
+                        </div>
+                      </div>
+                    )}
+                  </motion.div>
+                )}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Footer Branding */}
+          <div className="pt-20 text-center">
+            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 mb-4 px-8 leading-loose">
+              By authenticating, you acknowledge the sovereignty of your health data under the AyushAlert Unified Infrastructure Protocol.
+            </p>
+            <p className="text-xs font-bold text-zinc-500">
+              New to the protocol? <Link href="/patient/register" className="text-cyan-400 hover:text-cyan-300 transition-colors ml-1 uppercase tracking-widest">Register Identity</Link>
+            </p>
           </div>
-        )}
-      </div>
-      </div>
-
-      <div className="mt-8 text-center bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 px-6 py-3 rounded-full">
-        <p className="text-sm text-zinc-400">
-          Unregistered node? <Link href="/patient/register" className="text-indigo-400 hover:text-indigo-300 font-bold ml-1 transition">Register Identity</Link>
-        </p>
+        </div>
       </div>
     </div>
   );

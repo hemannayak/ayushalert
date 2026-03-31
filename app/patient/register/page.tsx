@@ -3,6 +3,10 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import * as faceapi from 'face-api.js';
+import { motion, AnimatePresence } from 'framer-motion';
+import { BrandLogo } from '@/components/BrandLogo';
+import { ScannerOverlay } from '@/components/ScannerOverlay';
+import { Shield, UserPlus, ArrowLeft, Activity, Database, Fingerprint } from 'lucide-react';
 
 export default function Register() {
   const router = useRouter();
@@ -138,139 +142,237 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4 relative overflow-hidden py-12">
-      {/* Background glow */}
-      <div className="absolute top-1/4 right-1/4 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-1/4 left-1/4 w-[600px] h-[600px] bg-sky-600/10 rounded-full blur-[120px] pointer-events-none" />
-      
-      <div className="w-full max-w-4xl glass-panel p-8 md:p-12 z-10 border-t-4 border-t-indigo-500">
-        <div className="flex items-center justify-between mb-8">
-          <Link href="/" className="flex items-center gap-1.5 text-xs font-bold text-zinc-500 hover:text-white transition uppercase tracking-widest">
-            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-            Home
+    <div className="min-h-screen bg-zinc-950 flex flex-col relative overflow-hidden">
+      {/* ── BACKGROUND MESH LAYER ────────────────────────────────────────── */}
+      <div className="absolute inset-0 opacity-[0.4] pointer-events-none select-none z-0">
+        <div className="absolute top-1/4 -right-1/4 w-[800px] h-[800px] bg-indigo-500/10 rounded-full blur-[160px]" />
+        <div className="absolute bottom-1/4 -left-1/4 w-[800px] h-[800px] bg-cyan-500/10 rounded-full blur-[160px]" />
+        <div 
+          className="absolute inset-0"
+          style={{ 
+            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.03) 1px, transparent 0)`,
+            backgroundSize: '40px 40px'
+          }}
+        />
+      </div>
+
+      {/* ── HEADER ──────────────────────────────────────────────────────── */}
+      <header className="relative z-10 border-b border-white/5 bg-zinc-950/50 backdrop-blur-xl">
+        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+          <Link href="/" className="group flex items-center gap-3 hover:opacity-80 transition-opacity">
+             <BrandLogo variant="horizontal" size={24} textSize={18} />
+          </Link>
+          <Link href="/patient/login" className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition flex items-center gap-2 group">
+             Existing Identity <ArrowLeft size={12} className="rotate-180 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
-        <div className="text-center mb-10">
-           <div className="w-16 h-16 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-3xl mx-auto mb-4 shadow-inner text-indigo-400">
-             ✨
-           </div>
-           <h2 className="text-3xl font-bold tracking-tight text-white mb-2">Patient Registration</h2>
-           <p className="text-zinc-400 text-sm">Create your biometric identity for the healthcare network.</p>
-        </div>
-      
-        {error && <div className="bg-red-900/40 border border-red-500/50 text-red-200 p-3 rounded-lg mb-6 text-sm font-medium">{error}</div>}
-        {success && <div className="bg-emerald-900/40 border border-emerald-500/50 text-emerald-200 p-3 rounded-lg mb-6 text-sm font-medium">{success}</div>}
-      
-        {!success && (
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-zinc-900/30 p-6 rounded-2xl border border-zinc-800/50">
-              <div>
-                  <label className="block text-sm font-medium text-zinc-300 mb-1">Full Name</label>
-                  <input required name="name" type="text" onChange={handleChange} className="w-full bg-zinc-900/80 border border-zinc-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-inner" />
+      </header>
+
+      <main className="flex-1 relative z-10 max-w-5xl mx-auto w-full px-6 py-12 lg:py-20">
+        <div className="grid lg:grid-cols-12 gap-12 items-start">
+          
+          {/* Left Column: Context & Stats */}
+          <div className="lg:col-span-4 space-y-8">
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-emerald-400">
+                <Activity size={12} strokeWidth={3} />
+                Sovereign Identity Hub
               </div>
-              <div>
-                  <label className="block text-sm font-medium text-zinc-300 mb-1">Email</label>
-                  <input required name="email" type="email" onChange={handleChange} className="w-full bg-zinc-900/80 border border-zinc-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-inner" />
-              </div>
-              <div>
-                  <label className="block text-sm font-medium text-zinc-300 mb-1">Mobile</label>
-                  <input required name="mobile" type="text" onChange={handleChange} className="w-full bg-zinc-900/80 border border-zinc-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-inner" />
-              </div>
-              <div>
-                  <label className="block text-sm font-medium text-zinc-300 mb-1">Password (Fallback)</label>
-                  <input required name="password" type="password" onChange={handleChange} className="w-full bg-zinc-900/80 border border-zinc-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-inner" />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-1">Gender</label>
-                <select required name="gender" onChange={handleChange} className="w-full bg-zinc-900/80 border border-zinc-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition appearance-none shadow-inner">
-                  <option value="" className="bg-zinc-800 text-zinc-400">Select Gender</option>
-                  <option value="Male" className="bg-zinc-800">Male</option>
-                  <option value="Female" className="bg-zinc-800">Female</option>
-                  <option value="Other" className="bg-zinc-800">Other</option>
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-zinc-300 mb-1">Date of Birth</label>
-                <input required name="dob" type="date" onChange={handleChange} className="w-full bg-zinc-900/80 border border-zinc-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-inner" style={{ colorScheme: 'dark' }} />
-              </div>
-              <div className="md:col-span-2">
-                <label className="block text-sm font-medium text-zinc-300 mb-1">Region Pincode</label>
-                <input name="pincode" type="text" placeholder="e.g. 500032" onChange={handleChange} className="w-full bg-zinc-900/80 border border-zinc-700 rounded-xl p-3 text-white focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition shadow-inner" />
-              </div>
+              <h1 className="text-5xl font-extrabold tracking-tighter leading-[0.85] text-white">
+                Enrollment <br /> 
+                <span className="text-zinc-600">Terminal.</span>
+              </h1>
+              <p className="text-sm text-zinc-500 font-medium leading-relaxed">
+                Connect your health data to the global infrastructure. Registration creates a decentralized biometric key unique to your physiology.
+              </p>
             </div>
-  
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-2xl p-8 text-center relative overflow-hidden shadow-inner">
-               <h3 className="font-bold text-white mb-2 tracking-tight text-lg">Biometric Signature</h3>
-               <p className="text-zinc-400 text-sm mb-6">Your unique facial geometry serves as your primary cryptographic key.</p>
-               
-               {!modelsLoaded && <p className="text-zinc-500 italic text-sm">Waking up Neural Engine...</p>}
-               
-               {modelsLoaded && !cameraActive && !facialDescriptor && (
-                  <button type="button" onClick={startCamera} className="bg-indigo-600/90 hover:bg-indigo-500 text-white font-semibold py-3 px-8 rounded-full transition shadow-[0_0_15px_rgba(79,70,229,0.3)]">
-                    Initialize Scanner
-                  </button>
-               )}
-  
-               <div className="flex justify-center mt-4">
-                   <video 
-                     ref={videoRef} 
-                     autoPlay 
-                     muted 
-                     playsInline
-                     className={`rounded-xl border border-indigo-500/30 object-cover shadow-2xl ${!cameraActive ? 'hidden' : ''}`}
-                     style={{ width: '320px', height: '240px' }}
-                   />
+
+            <div className="space-y-4 pt-6">
+               <div className="p-4 rounded-xl border border-white/5 bg-white/[0.02] space-y-2">
+                  <div className="flex items-center gap-2 text-zinc-400">
+                     <Database size={14} />
+                     <span className="text-[10px] font-black uppercase tracking-widest">Protocol</span>
+                  </div>
+                  <p className="text-xs font-bold text-zinc-300 font-mono">Decentralized Asset Hub (DAH) v4.0</p>
                </div>
-  
-               {cameraActive && !facialDescriptor && !capturing && (
-                   <p className="mt-6 text-sm font-semibold text-indigo-400 animate-pulse bg-indigo-900/20 inline-block px-4 py-2 rounded-full border border-indigo-500/20">
-                     Position your face clearly for geometry scan...
-                   </p>
-               )}
-  
-               {cameraActive && !facialDescriptor && capturing && (
-                   <div className="absolute inset-0 bg-indigo-900/40 backdrop-blur-sm flex items-center justify-center flex-col z-10">
-                     <p className="text-sm font-bold text-white mb-2">Acquiring Biometrics</p>
-                     <p className="text-2xl font-black text-white drop-shadow-[0_0_15px_rgba(79,70,229,0.8)] animate-bounce">
-                       Hold Still
-                     </p>
-                   </div>
-               )}
-  
-               {facialDescriptor && (
-                   <div className="mt-6 p-4 bg-emerald-900/20 rounded-xl border border-emerald-500/30">
-                      <p className="font-semibold text-emerald-400 flex items-center justify-center">
-                         ✅ Cryptographic Signature Captured 
-                      </p>
-                      <button 
-                         type="button" 
-                         onClick={() => { setFacialDescriptor(null); startCamera(); }}
-                         className="mt-3 text-xs text-zinc-400 hover:text-white transition uppercase tracking-wider font-semibold"
-                      >
-                         Retake Scan
-                      </button>
-                   </div>
-               )}
+               <div className="p-4 rounded-xl border border-white/5 bg-white/[0.02] space-y-2">
+                  <div className="flex items-center gap-2 text-zinc-400">
+                     <Shield size={14} />
+                     <span className="text-[10px] font-black uppercase tracking-widest">Privacy</span>
+                  </div>
+                  <p className="text-xs font-bold text-zinc-300 font-mono">Zero-Knowledge Biometric Proof</p>
+               </div>
             </div>
-  
-            <button disabled={loading || !facialDescriptor} type="submit" className="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(79,70,229,0.4)] transition disabled:opacity-50 disabled:shadow-none mt-4 text-lg tracking-wide">
-              {loading ? 'Encrypting Identity...' : 'Finalize Registration'}
-            </button>
-          </form>
-        )}
-  
-        {success && (
-          <button onClick={() => router.push('/patient/login')} className="w-full mt-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-4 rounded-xl shadow-[0_0_20px_rgba(79,70,229,0.4)] transition text-lg tracking-wide">
-            Proceed to Secure Login
-          </button>
-        )}
-      </div>
-      
-      <div className="mt-8 text-center bg-zinc-900/50 backdrop-blur-sm border border-zinc-800 px-6 py-3 rounded-full">
-        <p className="text-sm text-zinc-400">
-          Already registered? <Link href="/patient/login" className="text-indigo-400 hover:text-indigo-300 font-bold ml-1 transition">Login here</Link>
+          </div>
+
+          {/* Right Column: Enrollment Form */}
+          <div className="lg:col-span-8">
+            <motion.div 
+               initial={{ opacity: 0, y: 20 }}
+               animate={{ opacity: 1, y: 0 }}
+               className="glass-panel p-8 md:p-10 border-t-4 border-t-indigo-500 shadow-2xl relative overflow-hidden"
+            >
+              {/* Alert Area */}
+              {(error || success) && (
+                <div className={`p-4 rounded-xl mb-8 border text-xs font-bold flex items-center gap-3 ${
+                  error ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                }`}>
+                  <div className={`w-2 h-2 rounded-full shrink-0 ${error ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500 animate-pulse'}`} />
+                  {error || success}
+                </div>
+              )}
+
+              {!success ? (
+                <form onSubmit={handleSubmit} className="space-y-10">
+                  {/* Personal Nodes Section */}
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3">
+                       <div className="w-1 h-4 bg-indigo-500 rounded-full" />
+                       <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Personal Data Nodes</h3>
+                    </div>
+
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-600 px-1">Legal Full Name</label>
+                        <input required name="name" type="text" onChange={handleChange} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white text-sm font-semibold focus:ring-2 focus:ring-indigo-500 transition shadow-inner" placeholder="Johnathan Doe" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-600 px-1">Email Terminal</label>
+                        <input required name="email" type="email" onChange={handleChange} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white text-sm font-semibold focus:ring-2 focus:ring-indigo-500 transition shadow-inner" placeholder="identity@protocol.io" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-600 px-1">Mobile Uplink</label>
+                        <input required name="mobile" type="text" onChange={handleChange} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white text-sm font-semibold focus:ring-2 focus:ring-indigo-500 transition shadow-inner" placeholder="+91 00000 00000" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-600 px-1">Integrity Key (Password)</label>
+                        <input required name="password" type="password" onChange={handleChange} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white text-sm font-semibold focus:ring-2 focus:ring-indigo-500 transition shadow-inner" placeholder="••••••••••••" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-600 px-1">Gender Node</label>
+                        <div className="relative">
+                           <select required name="gender" onChange={handleChange} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white text-sm font-semibold focus:ring-2 focus:ring-indigo-500 transition appearance-none shadow-inner cursor-pointer">
+                              <option value="">Select Protocol</option>
+                              <option value="Male">Male</option>
+                              <option value="Female">Female</option>
+                              <option value="Other">Other</option>
+                           </select>
+                           <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-zinc-600">
+                              <Activity size={14} />
+                           </div>
+                        </div>
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-600 px-1">Date of Genesis (DOB)</label>
+                        <input required name="dob" type="date" onChange={handleChange} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white text-sm font-semibold focus:ring-2 focus:ring-indigo-500 transition shadow-inner" style={{ colorScheme: 'dark' }} />
+                      </div>
+                      <div className="md:col-span-2 space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-zinc-600 px-1">Regional Anchor (Pincode)</label>
+                        <input name="pincode" type="text" placeholder="e.g. 500032" onChange={handleChange} className="w-full bg-zinc-900 border border-zinc-800 rounded-xl p-4 text-white text-sm font-semibold focus:ring-2 focus:ring-indigo-500 transition shadow-inner" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Biometric Scan Section */}
+                  <div className="space-y-6 pt-6 border-t border-white/5">
+                    <div className="flex items-center gap-3">
+                       <div className="w-1 h-4 bg-cyan-500 rounded-full" />
+                       <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400">Biometric Seed Generation</h3>
+                    </div>
+
+                    <div className="bg-zinc-950/50 border border-zinc-900 rounded-2xl overflow-hidden shadow-inner flex flex-col items-center justify-center p-8 min-h-[320px] relative">
+                       {!modelsLoaded && (
+                          <div className="flex flex-col items-center gap-4">
+                             <Activity className="text-indigo-500/30 animate-pulse" size={40} />
+                             <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Syncing AI Core...</p>
+                          </div>
+                       )}
+
+                       {modelsLoaded && !cameraActive && !facialDescriptor && (
+                          <button type="button" onClick={startCamera} className="group relative h-16 w-16 rounded-full bg-white text-zinc-950 flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-[0_0_40px_rgba(255,255,255,0.2)]">
+                             <Fingerprint size={32} className="group-hover:animate-pulse" />
+                             <div className="absolute -inset-2 rounded-full border border-white/10 animate-ping opacity-20" />
+                          </button>
+                       )}
+
+                       <video 
+                          ref={videoRef} 
+                          autoPlay 
+                          muted 
+                          playsInline
+                          className={`w-full max-w-sm rounded-xl border border-indigo-500/20 object-cover shadow-2xl transition-all duration-700 ${!cameraActive ? 'hidden' : 'block'}`}
+                          style={{ height: '240px' }}
+                       />
+
+                       {cameraActive && (
+                          <ScannerOverlay 
+                             status={capturing ? 'verifying' : facialDescriptor ? 'success' : 'scanning'}
+                             label={capturing ? "Locking Geometry" : facialDescriptor ? "Seed Verified" : "Align to Grid"}
+                          />
+                       )}
+
+                       {facialDescriptor && !cameraActive && (
+                          <motion.div 
+                             initial={{ opacity: 0, scale: 0.9 }}
+                             animate={{ opacity: 1, scale: 1 }}
+                             className="flex flex-col items-center gap-4"
+                          >
+                             <div className="w-12 h-12 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shadow-[0_0_20px_rgba(16,185,129,0.2)]">
+                                <Shield size={24} />
+                             </div>
+                             <p className="text-[10px] font-black uppercase tracking-widest text-emerald-400">Signature Engraved</p>
+                             <button 
+                                type="button" 
+                                onClick={() => { setFacialDescriptor(null); startCamera(); }}
+                                className="text-[9px] font-black uppercase tracking-[0.2em] text-zinc-600 hover:text-white transition"
+                             >
+                                Recalibrate Signature
+                             </button>
+                          </motion.div>
+                       )}
+                    </div>
+                  </div>
+
+                  <button 
+                    disabled={loading || !facialDescriptor} 
+                    type="submit" 
+                    className="w-full bg-indigo-600 hover:bg-indigo-500 text-white h-16 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-[0_0_40px_rgba(79,70,229,0.3)] transition disabled:opacity-50 disabled:grayscale disabled:scale-100 active:scale-[0.98]"
+                  >
+                    {loading ? 'Encrypting Node Identity...' : 'Execute Enrollment'}
+                  </button>
+                </form>
+              ) : (
+                <div className="py-12 space-y-10 text-center">
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                     <BrandLogo variant="horizontal" size={32} />
+                     <span className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black uppercase tracking-widest text-indigo-400">Institutional Onboarding</span>
+                  </div>
+                  <div className="space-y-4">
+                     <div className="w-20 h-20 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 mx-auto shadow-[0_0_40px_rgba(16,185,129,0.3)]">
+                        <Fingerprint size={40} />
+                     </div>
+                     <h3 className="text-2xl font-black text-white">Enrollment Successful</h3>
+                     <p className="text-zinc-500 max-w-sm mx-auto text-sm font-medium">Your identity is now established within the AyushAlert infrastructure.</p>
+                  </div>
+                  
+                  <button 
+                    onClick={() => router.push('/patient/login')} 
+                    className="w-full bg-white text-zinc-950 h-16 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-[0_0_40px_rgba(255,255,255,0.1)] transition hover:bg-zinc-200"
+                  >
+                    Access Your Identity Node
+                  </button>
+                </div>
+              )}
+            </motion.div>
+          </div>
+        </div>
+      </main>
+
+      <footer className="relative z-10 py-12 px-6 border-t border-white/5 opacity-40">
+        <p className="text-center text-[10px] font-black uppercase tracking-[0.2em] text-zinc-600">
+          AyushAlert Unified Identity Infrastructure Protocol (AUIIP) v4.2.0
         </p>
-      </div>
+      </footer>
     </div>
   );
 }

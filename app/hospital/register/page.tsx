@@ -1,322 +1,226 @@
 'use client';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
+import { BrandLogo } from '@/components/BrandLogo';
+import { Building2, Shield, Lock, ChevronRight, AlertCircle, Clock, CheckCircle2, Mail, Key, MapPin, Phone, Globe, Upload, Trash2, ArrowRight, RefreshCcw } from 'lucide-react';
+
 
 type Step = 'form' | 'success';
 
-const FIELD_INPUT = 'w-full rounded-xl px-4 py-3 text-sm text-white placeholder-zinc-700 outline-none transition-all';
-const FIELD_STYLE = { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.09)' };
-const FOCUS_STYLE = { borderColor: 'rgba(99,102,241,0.6)' };
-const BLUR_STYLE  = { borderColor: 'rgba(255,255,255,0.09)' };
-
 export default function HospitalRegisterPage() {
+  const router = useRouter();
   const [step, setStep] = useState<Step>('form');
   const [hospitalId, setHospitalId] = useState('');
   const [submittedName, setSubmittedName] = useState('');
   const [logoPreview, setLogoPreview] = useState('');
-
-  const [form, setForm] = useState({
-    name:            '',
-    registration_id: '',
-    license_number:  '',
-    address:         '',
-    city:            '',
-    phone:           '',
-    logo_url:        '',   // base64 data URL
-    admin_email:     '',
-    password:        '',
-    confirm_password: '',
-  });
+  const [form, setForm] = useState({ name: '', registration_id: '', license_number: '', address: '', city: '', phone: '', logo_url: '', admin_email: '', password: '', confirm_password: '' });
   const [loading, setLoading] = useState(false);
-  const [error, setError]     = useState('');
+  const [error, setError] = useState('');
 
-  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm(f => ({ ...f, [k]: e.target.value }));
+  const set = (k: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => setForm(f => ({ ...f, [k]: e.target.value }));
 
-  // Convert uploaded file to base64
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (!file.type.startsWith('image/')) { setError('Please select a valid image file.'); return; }
-    if (file.size > 500 * 1024) { setError('Logo must be under 500 KB.'); return; }
+    const file = e.target.files?.[0]; if (!file) return;
+    if (!file.type.startsWith('image/')) { setError('Invalid artifact format.'); return; }
+    if (file.size > 500 * 1024) { setError('Payload exceeds 500 KB limit.'); return; }
     const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      setLogoPreview(result);
-      setForm(f => ({ ...f, logo_url: result }));
-    };
+    reader.onload = () => { const res = reader.result as string; setLogoPreview(res); setForm(f => ({ ...f, logo_url: res })); };
     reader.readAsDataURL(file);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError('');
-
-    if (form.password !== form.confirm_password) {
-      setError('Passwords do not match.'); return;
-    }
-    if (form.password.length < 8) {
-      setError('Password must be at least 8 characters.'); return;
-    }
+    e.preventDefault(); setError('');
+    if (form.password !== form.confirm_password) { setError('Credential mismatch.'); return; }
+    if (form.password.length < 8) { setError('Security requirement: Min 8 chars.'); return; }
     setLoading(true);
     try {
-      const res = await fetch('/api/hospital/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name:            form.name,
-          registration_id: form.registration_id,
-          license_number:  form.license_number,
-          address:         form.address,
-          city:            form.city,
-          phone:           form.phone,
-          logo_url:        form.logo_url,
-          admin_email:     form.admin_email,
-          password:        form.password,
-        }),
-      });
+      const res = await fetch('/api/hospital/register', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...form }) });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Registration failed');
-      setHospitalId(data.hospital_id);
-      setSubmittedName(data.name || form.name);
-      setStep('success');
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+      if (!res.ok) throw new Error(data.error || 'Provisioning failed');
+      setHospitalId(data.hospital_id); setSubmittedName(data.name || form.name); setStep('success');
+    } catch (err: any) { setError(err.message); }
+    finally { setLoading(false); }
   };
 
-  // ── SUCCESS SCREEN ──────────────────────────────────────────────────────────
   if (step === 'success') {
     return (
-      <div className="min-h-screen flex items-center justify-center px-4"
-        style={{ background: 'linear-gradient(135deg,#060610,#0c0c1a)' }}>
-        <div className="w-full max-w-md text-center space-y-6">
-          {/* Hospital logo if uploaded */}
-          {logoPreview ? (
-            <div className="w-20 h-20 rounded-3xl mx-auto overflow-hidden border-2 border-emerald-500/40 shadow-[0_0_30px_rgba(16,185,129,0.3)]">
-              <img src={logoPreview} alt="Hospital Logo" className="w-full h-full object-contain bg-white" />
-            </div>
-          ) : (
-            <div className="w-20 h-20 rounded-3xl mx-auto flex items-center justify-center text-4xl"
-              style={{ background: 'linear-gradient(135deg,#10b981,#059669)', boxShadow: '0 0 40px rgba(16,185,129,0.4)' }}>
-              ✓
-            </div>
-          )}
-          <div className="rounded-2xl p-8"
-            style={{ background: 'rgba(16,185,129,0.07)', border: '1px solid rgba(16,185,129,0.2)' }}>
-            {logoPreview && (
-              <p className="text-xs font-bold text-emerald-400 mb-1">{submittedName}</p>
-            )}
-            <h2 className="text-xl font-black text-white mb-2">Registration Submitted</h2>
-            <p className="text-sm text-zinc-400 leading-relaxed mb-4">
-              Your hospital application is under review by the AyushAlert verification team.
-              You will receive your API key via email once verified.
-            </p>
-            <div className="rounded-xl px-4 py-3 text-left mb-4"
-              style={{ background: 'rgba(0,0,0,0.3)', border: '1px solid rgba(255,255,255,0.06)' }}>
-              <p className="text-[9px] text-zinc-600 font-bold uppercase tracking-widest mb-1">Your Hospital ID</p>
-              <p className="text-sm font-mono font-bold text-emerald-400">{hospitalId}</p>
-              <p className="text-[9px] text-zinc-700 mt-1">Save this ID — you'll need it when contacting support.</p>
-            </div>
-            <div className="space-y-2 text-xs text-zinc-500 mb-6">
-              {[
-                '📋 Application received and queued for review',
-                '🖼 Hospital logo stored with your profile',
-                '🔍 Verification team will validate your govt. registration ID',
-                '🔑 API key issued to your admin email upon approval',
-                '✅ You can then access the Hospital EMR Sync portal',
-              ].map(s => <p key={s}>{s}</p>)}
-            </div>
-            <Link href="/hospital/login"
-              className="block w-full py-3 rounded-xl text-sm font-black text-white transition-all text-center"
-              style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', boxShadow: '0 0 20px rgba(99,102,241,0.3)' }}>
-              Go to Login →
-            </Link>
-          </div>
+      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6 relative overflow-hidden text-white font-sans">
+        <div className="absolute inset-0 opacity-[0.2] pointer-events-none z-0">
+          <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-emerald-600/10 rounded-full blur-[140px]" />
+          <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0)', backgroundSize: '40px 40px' }} />
         </div>
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="relative z-10 w-full max-w-xl text-center space-y-10">
+           <div className="w-24 h-24 rounded-[40px] mx-auto overflow-hidden border-4 border-emerald-500/10 shadow-2xl bg-zinc-900 flex items-center justify-center">
+              {logoPreview ? <img src={logoPreview} alt="Node Logo" className="w-full h-full object-contain" /> : <div className="text-emerald-500 scale-150"><Building2 size={32} /></div>}
+           </div>
+           <div className="rounded-3xl sm:rounded-[40px] border border-white/5 bg-zinc-900/40 backdrop-blur-3xl p-8 sm:p-12 space-y-8 shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500/20" />
+              <div className="space-y-2">
+                 <h2 className="text-3xl font-extrabold text-white uppercase tracking-tighter leading-none">Node Provisioned</h2>
+                 <p className="text-[10px] font-black uppercase tracking-[0.2em] text-emerald-500">Institutional application submitted</p>
+              </div>
+              <p className="text-sm text-zinc-500 leading-relaxed max-w-sm mx-auto">Your institutional profile is currently undergoing manual verification. Node activation keys will be transmitted to the admin endpoint upon approval.</p>
+              <div className="p-6 rounded-3xl bg-zinc-950/50 border border-white/5 text-center space-y-2">
+                 <p className="text-[9px] text-zinc-700 font-bold uppercase tracking-widest">Sovereign Hospital ID</p>
+                 <p className="text-lg font-black font-mono text-emerald-400">{hospitalId}</p>
+              </div>
+              <div className="space-y-3 text-[10px] font-black text-zinc-600 uppercase tracking-widest text-left max-w-xs mx-auto border-t border-white/5 pt-6">
+                 <div className="flex items-center gap-3">✓ Artifacts Transmitted</div>
+                 <div className="flex items-center gap-3">✓ Identity Node Pending Audit</div>
+                 <div className="flex items-center gap-3">✓ API Key Cycle Initialized</div>
+              </div>
+              <Link href="/hospital/login" className="block w-full py-5 rounded-3xl bg-indigo-500 text-white text-[11px] font-black uppercase tracking-widest hover:bg-indigo-600 transition shadow-2xl shadow-indigo-500/30 active:scale-95">Access Gateway Protocol <ArrowRight size={16} className="inline ml-2" /></Link>
+           </div>
+        </motion.div>
       </div>
     );
   }
 
-  // ── REGISTRATION FORM ───────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen py-10 px-4" style={{ background: 'linear-gradient(135deg,#060610,#0c0c1a)' }}>
-      {/* Ambient glow */}
-      <div className="fixed inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-1/4 right-1/4 w-80 h-80 rounded-full opacity-[0.06]"
-          style={{ background: 'radial-gradient(circle,#6366f1,transparent)' }} />
+    <div className="min-h-screen bg-zinc-950 flex flex-col items-center py-12 px-6 relative overflow-hidden text-white font-sans">
+      <div className="absolute inset-0 opacity-[0.25] pointer-events-none z-0">
+        <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-indigo-600/10 rounded-full blur-[140px]" />
+        <div className="absolute bottom-0 left-0 w-[1000px] h-[1000px] bg-violet-600/5 rounded-full blur-[140px]" />
+        <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0)', backgroundSize: '40px 40px' }} />
       </div>
 
-      <div className="relative z-10 max-w-2xl mx-auto space-y-6">
-        {/* Header */}
-        <div className="text-center">
-          <div className="w-14 h-14 rounded-2xl mx-auto flex items-center justify-center text-2xl mb-4"
-            style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', boxShadow: '0 0 30px rgba(99,102,241,0.4)' }}>
-            🏥
-          </div>
-          <h1 className="text-3xl font-black text-white">Hospital Registration</h1>
-          <p className="text-sm text-zinc-500 mt-2">
-            Register your hospital with AyushAlert. After verification by our team, you'll receive your API key to access the EMR Sync portal.
-          </p>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 w-full max-w-3xl space-y-12">
+        <div className="text-center space-y-4">
+           <div className="w-20 h-20 rounded-3xl bg-zinc-900/50 flex items-center justify-center mx-auto shadow-2xl border border-indigo-500/10 group hover:scale-110 transition-transform">
+              <BrandLogo variant="icon" size={48} />
+           </div>
+           <div className="space-y-1">
+              <h1 className="text-3xl font-extrabold tracking-tighter uppercase text-white leading-none">Institutional Enrollment</h1>
+              <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">Provisioning Sovereign identity nodes for hospitals</p>
+           </div>
         </div>
 
-        {/* Info note */}
-        <div className="rounded-xl px-5 py-3 flex items-start gap-3"
-          style={{ background: 'rgba(99,102,241,0.07)', border: '1px solid rgba(99,102,241,0.18)' }}>
-          <span className="text-indigo-400 shrink-0 mt-0.5 text-sm">ℹ</span>
-          <p className="text-[11px] text-indigo-300/60 leading-relaxed">
-            Only ABDM-registered hospitals may sync clinical records into patient health profiles.
-            Provide accurate Government registration and license details for faster verification.
-          </p>
+        <div className="p-6 rounded-3xl bg-indigo-500/5 border border-indigo-500/10 flex items-start gap-4">
+           <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 mt-1"><Shield size={20} /></div>
+           <div className="space-y-1">
+              <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Institutional Integrity Check</p>
+              <p className="text-[11px] text-zinc-500 font-medium leading-relaxed">Only ABDM-registered healthcare entities are eligible for node provisioning. All registration artifacts are cross-checked against national registries.</p>
+           </div>
         </div>
 
-        {/* Error */}
-        {error && (
-          <div className="rounded-xl px-5 py-3 text-sm font-semibold text-rose-400"
-            style={{ background: 'rgba(244,63,94,0.08)', border: '1px solid rgba(244,63,94,0.2)' }}>
-            ⚠ {error}
-          </div>
-        )}
+        {error && <div className="p-4 rounded-2xl bg-rose-500/5 border border-rose-500/20 text-rose-400 text-[10px] font-black uppercase flex items-center gap-3 animate-in shake-200"><AlertCircle size={14} /> {error}</div>}
 
-        <form onSubmit={handleSubmit} className="space-y-5">
-          {/* ── Hospital Identity ── */}
-          <div className="rounded-2xl p-6 space-y-4"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Hospital Identity</p>
-
-            <div>
-              <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest block mb-1.5">Hospital Name *</label>
-              <input required type="text" placeholder="e.g. Yashoda Hospitals" value={form.name}
-                onChange={set('name')} className={FIELD_INPUT} style={FIELD_STYLE}
-                onFocus={e => Object.assign(e.target.style, FOCUS_STYLE)}
-                onBlur={e => Object.assign(e.target.style, BLUR_STYLE)} />
-            </div>
-
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest block mb-1.5">Govt. Registration ID *</label>
-                <input required type="text" placeholder="TSMC/REG/2005/001" value={form.registration_id}
-                  onChange={set('registration_id')} className={`${FIELD_INPUT} uppercase`} style={FIELD_STYLE}
-                  onFocus={e => Object.assign(e.target.style, FOCUS_STYLE)}
-                  onBlur={e => Object.assign(e.target.style, BLUR_STYLE)} />
+        <form onSubmit={handleSubmit} className="space-y-10">
+           {/* SECTION 1 */}
+           <div className="rounded-[40px] border border-white/5 bg-zinc-900/40 backdrop-blur-3xl p-10 space-y-10 shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 left-0 w-full h-1 bg-white/5 group-hover:bg-indigo-500/20 transition-all" />
+              <div className="flex items-center gap-4 border-b border-white/5 pb-6">
+                 <Building2 className="text-indigo-400" size={20} />
+                 <h2 className="text-lg font-black tracking-tighter uppercase text-white">Institutional Identity</h2>
               </div>
-              <div>
-                <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest block mb-1.5">License Number</label>
-                <input type="text" placeholder="LIC-XXXX-YYYY" value={form.license_number}
-                  onChange={set('license_number')} className={FIELD_INPUT} style={FIELD_STYLE}
-                  onFocus={e => Object.assign(e.target.style, FOCUS_STYLE)}
-                  onBlur={e => Object.assign(e.target.style, BLUR_STYLE)} />
+              <div className="grid md:grid-cols-2 gap-8">
+                 <div className="md:col-span-2 space-y-3">
+                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] px-1">Hospital Formal Title</label>
+                    <input required type="text" placeholder="e.g. Apollo Health City" value={form.name} onChange={set('name')} className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-6 py-5 text-sm font-black text-white outline-none focus:ring-2 focus:ring-indigo-500/40 transition" />
+                 </div>
+                 <div className="space-y-3">
+                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] px-1">Govt. Registry ID</label>
+                    <input required type="text" placeholder="TSMC/REG/YYYY" value={form.registration_id} onChange={set('registration_id')} className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-6 py-5 text-xs font-black font-mono text-white outline-none focus:ring-2 focus:ring-indigo-500/40 transition placeholder-zinc-800" />
+                 </div>
+                 <div className="space-y-3">
+                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] px-1">Operational License</label>
+                    <input type="text" placeholder="LIC-XXXX-YYYY" value={form.license_number} onChange={set('license_number')} className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-6 py-5 text-xs font-black font-mono text-white outline-none focus:ring-2 focus:ring-indigo-500/40 transition placeholder-zinc-800" />
+                 </div>
               </div>
-            </div>
-
-            {/* Logo Upload */}
-            <div>
-              <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest block mb-1.5">
-                Hospital Logo <span className="text-zinc-700 normal-case tracking-normal">(PNG/JPG · max 500 KB)</span>
-              </label>
-              <div className="flex items-center gap-4">
-                {/* Preview */}
-                <div className="w-14 h-14 rounded-xl flex-shrink-0 flex items-center justify-center overflow-hidden"
-                  style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)' }}>
-                  {logoPreview
-                    ? <img src={logoPreview} alt="Logo preview" className="w-full h-full object-contain" />
-                    : <span className="text-2xl opacity-30">🏥</span>}
-                </div>
-                <label className="flex-1 cursor-pointer">
-                  <div className="rounded-xl px-4 py-3 text-xs text-zinc-500 hover:text-zinc-300 transition-all text-center"
-                    style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed rgba(255,255,255,0.12)' }}>
-                    {logoPreview ? '✓ Logo uploaded — click to change' : '⬆ Click to upload logo'}
-                  </div>
-                  <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
-                </label>
+              
+              <div className="space-y-3">
+                 <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] px-1">Institutional Artifact (Logo)</label>
+                 <div className="flex items-center gap-6">
+                    <div className="w-20 h-20 rounded-3xl bg-zinc-950 border border-zinc-800 flex items-center justify-center overflow-hidden shrink-0">
+                       {logoPreview ? <img src={logoPreview} className="w-full h-full object-contain" /> : <Building2 size={24} className="text-zinc-800" />}
+                    </div>
+                    <label className="flex-1 cursor-pointer group/upload">
+                       <div className="rounded-2xl border-2 border-dashed border-zinc-800 p-6 text-center group-hover/upload:border-indigo-500/40 group-hover/upload:bg-zinc-900/50 transition-all">
+                          <p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest mb-1 group-hover/upload:text-indigo-400">{logoPreview ? '✓ Artifact Loaded' : '↑ Upload Institutional Mark'}</p>
+                          <p className="text-[9px] text-zinc-800 font-bold uppercase tracking-widest">(PNG/JPG · Max 500KB)</p>
+                       </div>
+                       <input type="file" accept="image/*" onChange={handleLogoUpload} className="hidden" />
+                    </label>
+                 </div>
+                 {logoPreview && <button type="button" onClick={()=>{setLogoPreview(''); setForm(f=>({...f, logo_url:''}));}} className="text-[9px] font-black text-rose-500 hover:text-rose-400 transition ml-2 uppercase flex items-center gap-2"><Trash2 size={10}/> Purge Artifact</button>}
               </div>
-              {logoPreview && (
-                <button type="button" onClick={() => { setLogoPreview(''); setForm(f => ({ ...f, logo_url: '' })); }}
-                  className="text-[9px] text-zinc-700 hover:text-rose-400 mt-1 pl-1 transition-colors">✕ Remove logo</button>
-              )}
-            </div>
-          </div>
+           </div>
 
-          {/* ── Contact & Location ── */}
-          <div className="rounded-2xl p-6 space-y-4"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Location & Contact</p>
-
-            <div>
-              <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest block mb-1.5">Full Address *</label>
-              <input required type="text" placeholder="Street, Area, City - PIN" value={form.address}
-                onChange={set('address')} className={FIELD_INPUT} style={FIELD_STYLE}
-                onFocus={e => Object.assign(e.target.style, FOCUS_STYLE)}
-                onBlur={e => Object.assign(e.target.style, BLUR_STYLE)} />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest block mb-1.5">City</label>
-                <input type="text" placeholder="Hyderabad" value={form.city}
-                  onChange={set('city')} className={FIELD_INPUT} style={FIELD_STYLE}
-                  onFocus={e => Object.assign(e.target.style, FOCUS_STYLE)}
-                  onBlur={e => Object.assign(e.target.style, BLUR_STYLE)} />
+           {/* SECTION 2 */}
+           <div className="rounded-[40px] border border-white/5 bg-zinc-900/40 backdrop-blur-3xl p-10 space-y-10 shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 left-0 w-1 h-full bg-white/5 group-hover:bg-violet-500/20 transition-all" />
+              <div className="flex items-center gap-4 border-b border-white/5 pb-6">
+                 <MapPin className="text-violet-400" size={20} />
+                 <h2 className="text-lg font-black tracking-tighter uppercase text-white">Geocode & Metadata</h2>
               </div>
-              <div>
-                <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest block mb-1.5">Phone Number</label>
-                <input type="tel" placeholder="+91-40-XXXX-XXXX" value={form.phone}
-                  onChange={set('phone')} className={FIELD_INPUT} style={FIELD_STYLE}
-                  onFocus={e => Object.assign(e.target.style, FOCUS_STYLE)}
-                  onBlur={e => Object.assign(e.target.style, BLUR_STYLE)} />
+              <div className="space-y-8">
+                 <div className="space-y-3">
+                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] px-1">Physical Coordinate (Address)</label>
+                    <input required type="text" placeholder="Street, Area, City - Pin" value={form.address} onChange={set('address')} className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-6 py-5 text-sm font-black text-white outline-none focus:ring-2 focus:ring-violet-500/40 transition" />
+                 </div>
+                 <div className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                       <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] px-1">Registry City</label>
+                       <div className="relative">
+                          <Globe size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-700" />
+                          <input type="text" placeholder="Hyderabad" value={form.city} onChange={set('city')} className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl pl-14 pr-6 py-5 text-[11px] font-black text-white uppercase outline-none focus:ring-2 focus:ring-violet-500/40 transition placeholder-zinc-800" />
+                       </div>
+                    </div>
+                    <div className="space-y-3">
+                       <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] px-1">Comm-Channel (Phone)</label>
+                       <div className="relative">
+                          <Phone size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-700" />
+                          <input type="tel" placeholder="+91-40-XXXX-XXXX" value={form.phone} onChange={set('phone')} className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl pl-14 pr-6 py-5 text-[11px] font-black font-mono text-white outline-none focus:ring-2 focus:ring-violet-500/40 transition placeholder-zinc-800" />
+                       </div>
+                    </div>
+                 </div>
               </div>
-            </div>
-          </div>
+           </div>
 
-          {/* ── Admin Account ── */}
-          <div className="rounded-2xl p-6 space-y-4"
-            style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-            <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Admin Account Credentials</p>
-
-            <div>
-              <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest block mb-1.5">Admin Email *</label>
-              <input required type="email" placeholder="admin@yourhospital.com" value={form.admin_email}
-                onChange={set('admin_email')} className={FIELD_INPUT} style={FIELD_STYLE}
-                onFocus={e => Object.assign(e.target.style, FOCUS_STYLE)}
-                onBlur={e => Object.assign(e.target.style, BLUR_STYLE)} />
-              <p className="text-[9px] text-zinc-700 mt-1 pl-1">Your API key will be sent to this email after verification.</p>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest block mb-1.5">Password *</label>
-                <input required type="password" placeholder="Min. 8 characters" value={form.password}
-                  onChange={set('password')} className={FIELD_INPUT} style={FIELD_STYLE}
-                  onFocus={e => Object.assign(e.target.style, FOCUS_STYLE)}
-                  onBlur={e => Object.assign(e.target.style, BLUR_STYLE)} />
+           {/* SECTION 3 */}
+           <div className="rounded-[40px] border border-white/5 bg-zinc-900/40 backdrop-blur-3xl p-10 space-y-10 shadow-2xl relative overflow-hidden group">
+              <div className="absolute top-0 right-0 w-1 h-full bg-white/5 group-hover:bg-emerald-500/20 transition-all" />
+              <div className="flex items-center gap-4 border-b border-white/5 pb-6">
+                 <Key className="text-emerald-400" size={20} />
+                 <h2 className="text-lg font-black tracking-tighter uppercase text-white">Vault Custodian</h2>
               </div>
-              <div>
-                <label className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest block mb-1.5">Confirm Password *</label>
-                <input required type="password" placeholder="Re-enter password" value={form.confirm_password}
-                  onChange={set('confirm_password')} className={FIELD_INPUT} style={FIELD_STYLE}
-                  onFocus={e => Object.assign(e.target.style, FOCUS_STYLE)}
-                  onBlur={e => Object.assign(e.target.style, BLUR_STYLE)} />
+              <div className="space-y-8">
+                 <div className="space-y-3">
+                    <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] px-1">Custodian Endpoint (Email)</label>
+                    <div className="relative">
+                       <Mail size={16} className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-700" />
+                       <input required type="email" placeholder="admin@institutional.hub" value={form.admin_email} onChange={set('admin_email')} className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl pl-14 pr-6 py-5 text-sm font-black text-white outline-none focus:ring-2 focus:ring-emerald-500/40 transition placeholder-zinc-800" />
+                    </div>
+                    <p className="text-[9px] font-black text-zinc-700 uppercase tracking-widest pl-2">Provisioned API keys will be transmitted to this endpoint.</p>
+                 </div>
+                 <div className="grid md:grid-cols-2 gap-8">
+                    <div className="space-y-3">
+                       <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] px-1">Vault Key (Password)</label>
+                       <input required type="password" placeholder="Min 8 chars" value={form.password} onChange={set('password')} className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-6 py-5 text-sm font-black text-white outline-none focus:ring-2 focus:ring-emerald-500/40 transition placeholder-zinc-800" />
+                    </div>
+                    <div className="space-y-3">
+                       <label className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.2em] px-1">Confirm Key</label>
+                       <input required type="password" placeholder="Verify vault key" value={form.confirm_password} onChange={set('confirm_password')} className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-6 py-5 text-sm font-black text-white outline-none focus:ring-2 focus:ring-emerald-500/40 transition placeholder-zinc-800" />
+                    </div>
+                 </div>
               </div>
-            </div>
-          </div>
+           </div>
 
-          {/* Submit */}
-          <button type="submit" disabled={loading}
-            className="w-full py-4 rounded-xl text-sm font-black text-white flex items-center justify-center gap-2 transition-all disabled:opacity-60"
-            style={{ background: 'linear-gradient(135deg,#6366f1,#8b5cf6)', boxShadow: '0 4px 30px rgba(99,102,241,0.4)' }}>
-            {loading
-              ? <><span className="animate-spin">⟳</span> Submitting Application...</>
-              : '📝 Submit Registration Application'}
-          </button>
+           <button type="submit" disabled={loading} className="w-full py-6 rounded-[32px] bg-white text-black text-[12px] font-black uppercase tracking-widest hover:bg-zinc-200 transition shadow-2xl shadow-white/5 active:scale-95 disabled:opacity-30">
+              {loading ? <RefreshCcw size={20} className="animate-spin inline mr-2" /> : <CheckCircle2 size={20} className="inline mr-2" />} 
+              {loading ? 'Transmitting Application...' : 'Commit Enrollment Data'}
+           </button>
         </form>
 
-        <p className="text-center text-sm text-zinc-600">
-          Already registered?{' '}
-          <Link href="/hospital/login" className="text-indigo-400 hover:text-indigo-300 font-semibold">
-            Login with admin credentials →
-          </Link>
+        <p className="text-center text-[10px] text-zinc-600 font-black uppercase tracking-widest">
+           Already Provisioned?{' '}
+           <Link href="/hospital/login" className="text-indigo-400 hover:text-indigo-300 border-b border-indigo-900 transition">
+              Access Institutional Vault →
+           </Link>
         </p>
-      </div>
+      </motion.div>
     </div>
   );
 }

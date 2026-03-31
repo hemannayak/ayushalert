@@ -3,6 +3,10 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import * as faceapi from 'face-api.js';
+import { motion, AnimatePresence } from 'framer-motion';
+import { BrandLogo } from '@/components/BrandLogo';
+import { ScannerOverlay } from '@/components/ScannerOverlay';
+import { Stethoscope, Lock, Mail, Fingerprint, Activity, Database } from "lucide-react";
 
 export default function DoctorLogin() {
   const router = useRouter();
@@ -185,122 +189,239 @@ export default function DoctorLogin() {
   };
 
   return (
-    <div className="max-w-md mx-auto bg-zinc-900/80 backdrop-blur-xl p-8 rounded-2xl shadow-2xl mt-20 border border-zinc-800/80 shadow-emerald-500/5">
-      <div className="flex items-center justify-between mb-4">
-        <Link href="/" className="flex items-center gap-1.5 text-xs font-bold text-zinc-500 hover:text-white transition uppercase tracking-widest">
-          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /></svg>
-          Home
-        </Link>
+    <div className="min-h-screen bg-zinc-950 flex flex-col lg:flex-row relative overflow-hidden">
+      {/* ── BACKGROUND MESH LAYER ────────────────────────────────────────── */}
+      <div className="absolute inset-0 opacity-[0.3] pointer-events-none select-none z-0">
+        <div className="absolute top-1/4 -right-1/4 w-[800px] h-[800px] bg-cyan-600/10 rounded-full blur-[160px]" />
+        <div className="absolute bottom-1/4 -left-1/4 w-[800px] h-[800px] bg-zinc-600/10 rounded-full blur-[160px]" />
+        <div 
+          className="absolute inset-0"
+          style={{ 
+            backgroundImage: `radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0)`,
+            backgroundSize: '30px 30px'
+          }}
+        />
       </div>
-      <h2 className="text-2xl font-extrabold mb-6 text-center text-white">Doctor Secure Login</h2>
-      
-      {error && <div className="bg-red-500/10 border border-red-500/50 text-red-500 p-3 rounded-lg mb-4 text-sm font-semibold">{error}</div>}
-      {success && <div className="bg-emerald-900/40 border border-emerald-500/50 text-emerald-300 p-3 rounded-lg mb-4 text-sm font-semibold flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(16,185,129,0.2)]"><div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>{success}</div>}
-      
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-zinc-400 font-semibold mb-1">Doctor ID</label>
-          <input 
-            required 
-            placeholder="DOC_..."
-            value={doctorId}
-            type="text" 
-            onChange={(e) => setDoctorId(e.target.value)} 
-            disabled={otpSent}
-            className="w-full bg-zinc-950 border border-zinc-800 text-white rounded-xl shadow-sm p-3 text-center text-lg font-mono outline-none focus:ring-1 focus:ring-emerald-500/50 focus:border-emerald-500/50 disabled:bg-zinc-800 disabled:text-zinc-500" 
-          />
+
+      {/* ── LEFT PANEL: CLINICAL AUTHORITY ───────────────────────────── */}
+      <div className="hidden lg:flex lg:w-1/2 flex-col justify-between p-16 relative z-10 border-r border-white/5 bg-zinc-950">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
+          <Link href="/" className="inline-block hover:opacity-80 transition-opacity">
+            <BrandLogo variant="horizontal" size={32} />
+          </Link>
+        </motion.div>
+
+        <div className="space-y-8 max-w-lg">
+          <motion.div 
+            initial={{ opacity: 0, x: -30 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ delay: 0.2 }}
+          >
+            <div className="space-y-4">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-violet-400">
+                <Stethoscope size={12} strokeWidth={3} />
+                Clinical Authority
+              </div>
+              <h1 className="text-5xl font-extrabold tracking-tighter leading-[0.85] text-white uppercase">
+                Provider <br /> 
+                <span className="text-zinc-600">Terminal.</span>
+              </h1>
+            </div>
+          </motion.div>
+
+          <motion.p 
+            className="text-lg text-zinc-500 font-medium leading-relaxed"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            Access your unified clinical dashboard to manage patient synchronization, verify EMR protocols, and establish secure health handshakes.
+          </motion.p>
         </div>
 
-        {/* Method Toggle */}
-        {!otpSent && (
-        <div className="flex bg-black/40 p-1 rounded-xl border border-zinc-800/80 mt-4">
-           <button onClick={() => setLoginMethod('face')} className={`flex-1 py-2 rounded-lg font-bold text-sm transition ${loginMethod === 'face' ? 'bg-zinc-800 text-white shadow' : 'text-zinc-500 hover:text-zinc-300'}`}>FaceID</button>
-           <button onClick={() => { setLoginMethod('otp'); stopCamera(); }} className={`flex-1 py-2 rounded-lg font-bold text-sm transition ${loginMethod === 'otp' ? 'bg-zinc-800 text-white shadow' : 'text-zinc-500 hover:text-zinc-300'}`}>Email OTP</button>
-        </div>
-        )}
+        <motion.div 
+          className="flex items-center gap-12 pt-8 border-t border-white/5"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5 }}
+        >
+          {[
+            { label: 'Network', value: 'Institutional' },
+            { label: 'Uptime', value: '99.99%' },
+            { label: 'Standard', value: 'ABDM-V3' },
+          ].map((stat, i) => (
+            <div key={i} className="space-y-1">
+              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">{stat.label}</p>
+              <p className="text-sm font-bold text-zinc-400 font-mono">{stat.value}</p>
+            </div>
+          ))}
+        </motion.div>
+      </div>
 
-        {loginMethod === 'face' ? (
-        <div className="bg-black/40 border border-zinc-800/80 p-6 rounded-xl flex flex-col items-center mt-4">
-            {!modelsLoaded && <p className="text-sm text-zinc-500 italic">Initializing Facial Model...</p>}
-            
-            {modelsLoaded && !cameraActive && (
-                <button 
-                  onClick={startCamera} 
-                  disabled={!doctorId.trim()}
-                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-semibold px-6 py-2 rounded-xl transition disabled:opacity-50 shadow-[0_0_15px_rgba(16,185,129,0.3)]"
-                 >
-                  Turn on Camera
-                </button>
-            )}
-
-            <video 
-                ref={videoRef} 
-                autoPlay 
-                muted 
-                playsInline
-                className={`rounded-lg border-2 border-emerald-300 mt-3 shadow ${!cameraActive ? 'hidden' : ''}`}
-                style={{ width: '100%', maxWidth: '300px' }}
-            />
-
-            {cameraActive && !loading && countdown === null && (
-                <p className="mt-4 text-sm font-bold text-emerald-400 animate-pulse">
-                   Scanning for your face... Please look forward.
-                </p>
-            )}
-
-            {countdown !== null && (
-                <p className="mt-4 text-sm font-bold border border-emerald-500/50 bg-emerald-500/10 p-3 rounded-lg text-emerald-400 animate-pulse text-center">
-                   Face detected! Auto-logging in in <span className="text-xl mx-1">{countdown}</span> seconds...
-                </p>
-            )}
-
-            {loading && (
-                <p className="mt-4 text-sm font-bold text-emerald-500 animate-pulse">
-                   Authenticating...
-                </p>
-            )}
-        </div>
-        ) : (
-          <div className="mt-4 bg-black/40 p-6 rounded-xl border border-zinc-800/80 text-center">
-             {!otpSent ? (
-                <div>
-                   <p className="text-sm text-zinc-400 mb-4">A secure 6-digit code will be sent to your registered clinic email.</p>
-                   <button onClick={requestOtp} disabled={loading || !doctorId.trim()} className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.3)] transition disabled:opacity-50">
-                      {loading ? 'Generating...' : 'Send Login Code'}
-                   </button>
-                </div>
-             ) : (
-                <div className="space-y-4">
-                   <p className="text-sm text-emerald-400 font-semibold bg-emerald-500/10 border border-emerald-500/30 p-2 rounded-lg">✅ Secure code sent!</p>
-                   <input
-                     type="text"
-                     placeholder="Enter 6-digit OTP"
-                     value={otp}
-                     onChange={e => setOtp(e.target.value)}
-                     className="w-full bg-zinc-950 border border-zinc-800 text-white rounded-xl px-3 py-3 text-center font-mono text-2xl tracking-[0.5em] outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50"
-                     maxLength={6}
-                   />
-                   <button onClick={verifyOtp} disabled={loading || otp.length < 6} className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.3)] transition disabled:opacity-50">
-                      {loading ? 'Verifying...' : 'Verify & Enter Portal'}
-                   </button>
-                   <div className="flex justify-between items-center w-full pt-2 px-1">
-                      <button onClick={requestOtp} disabled={loading} className="text-xs text-emerald-400 font-bold hover:text-emerald-300 transition uppercase tracking-widest flex items-center gap-1">
-                         <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" /></svg>
-                         Resend
-                      </button>
-                      <button onClick={() => { setOtpSent(false); setOtp(''); }} disabled={loading} className="text-xs text-zinc-500 font-bold hover:text-white transition uppercase tracking-widest text-right">
-                         Change ID
-                      </button>
-                   </div>
-                </div>
-             )}
+      {/* ── RIGHT PANEL: THE COMMAND INTERFACE ─────────────────────────── */}
+      <div className="flex-1 flex flex-col justify-center items-center p-6 sm:p-12 lg:p-24 relative z-10 overflow-y-auto min-h-screen lg:min-h-0">
+        <div className="w-full max-w-[440px] space-y-10">
+          
+          {/* Mobile UI */}
+          <div className="lg:hidden flex justify-center mb-8">
+            <div className="flex flex-col sm:flex-row items-center gap-4">
+              <BrandLogo variant="horizontal" size={32} />
+              <span className="px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-[10px] font-black uppercase tracking-widest text-violet-400">Clinical Terminal</span>
+            </div>
           </div>
-        )}
-      </div>
 
-      <p className="mt-8 text-center text-sm text-zinc-500 border-t border-zinc-800/50 pt-4">
-        Don&apos;t have an account? <Link href="/doctor/register" className="text-emerald-500 hover:text-emerald-400 font-medium transition">Register here</Link>
-      </p>
+          <div className="space-y-3">
+             <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
+                Institutional Login
+                <span className="text-[10px] bg-zinc-900 border border-zinc-800 text-zinc-500 px-2 py-1 rounded">V4.0</span>
+             </h2>
+             <p className="text-zinc-500 text-sm font-medium font-mono uppercase tracking-tight">System: provider_auth_orchestrator</p>
+          </div>
+
+          <AnimatePresence mode="wait">
+            <motion.div 
+              key="doctor-login-form"
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-8"
+            >
+              {/* Alert Area */}
+              {(error || success) && (
+                <div className={`p-4 rounded-xl border text-xs font-bold flex items-center gap-3 ${
+                  error ? 'bg-rose-500/10 border-rose-500/20 text-rose-400' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
+                }`}>
+                  <div className={`w-2 h-2 rounded-full shrink-0 ${error ? 'bg-rose-500 animate-pulse' : 'bg-emerald-500 animate-pulse'}`} />
+                  {error || success}
+                </div>
+              )}
+
+              {/* ID INPUT */}
+              <div className="space-y-4">
+                <div className="relative group">
+                  <div className="absolute inset-0 bg-cyan-500/5 blur-2xl group-focus-within:bg-cyan-500/10 transition-colors" />
+                  <div className="relative">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 block mb-2 px-1">Clinical License / Provider ID</label>
+                    <input 
+                      required 
+                      placeholder="DOC_••••••••"
+                      value={doctorId}
+                      type="text" 
+                      onChange={(e) => setDoctorId(e.target.value)} 
+                      disabled={otpSent || loading}
+                      className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl p-5 text-white text-center text-xl font-mono tracking-widest focus:ring-2 focus:ring-cyan-500/50 focus:border-cyan-500/50 outline-none disabled:opacity-50 transition shadow-2xl" 
+                    />
+                  </div>
+                </div>
+
+                {!otpSent && (
+                  <div className="flex bg-zinc-900/80 p-1.5 rounded-2xl border border-zinc-800/80 shadow-inner">
+                    <button onClick={() => setLoginMethod('face')} className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${loginMethod === 'face' ? 'bg-zinc-800 text-cyan-400 shadow-xl border border-white/5' : 'text-zinc-500 hover:text-zinc-300'}`}>
+                      <Fingerprint size={14} /> Biometrics
+                    </button>
+                    <button onClick={() => { setLoginMethod('otp'); stopCamera(); }} className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${loginMethod === 'otp' ? 'bg-zinc-800 text-cyan-400 shadow-xl border border-white/5' : 'text-zinc-500 hover:text-zinc-300'}`}>
+                      <Mail size={14} /> Digital Key
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* AUTH AREA */}
+              <div className="relative min-h-[260px]">
+                {loginMethod === 'face' ? (
+                  <div className="aspect-video w-full bg-zinc-900/40 rounded-2xl border border-zinc-800/80 flex flex-col items-center justify-center relative overflow-hidden shadow-2xl">
+                    {!modelsLoaded && (
+                      <div className="flex flex-col items-center gap-3">
+                        <Activity className="text-indigo-400 animate-pulse" size={32} />
+                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Loading Clinical Neural Nets...</p>
+                      </div>
+                    )}
+                    
+                    {modelsLoaded && !cameraActive && (
+                      <button 
+                        onClick={startCamera} 
+                        disabled={!doctorId.trim()}
+                        className="h-16 w-16 rounded-full bg-cyan-500 text-zinc-950 flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-30 shadow-[0_0_30px_rgba(34,211,238,0.4)]"
+                      >
+                        <Fingerprint size={32} />
+                      </button>
+                    )}
+
+                    <video 
+                      ref={videoRef} 
+                      autoPlay 
+                      muted 
+                      playsInline
+                      className={`w-full h-full object-cover transition-opacity duration-700 ${!cameraActive ? 'opacity-0' : 'opacity-100'}`}
+                    />
+
+                    {cameraActive && (
+                      <ScannerOverlay 
+                        status={loading ? 'verifying' : countdown !== null ? 'verifying' : 'scanning'}
+                        countdown={countdown}
+                        label={loading ? "Analyzing Credential Vector" : "Live Feed: Secure"} 
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <div className="p-8 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 text-center space-y-8 shadow-2xl">
+                    {!otpSent ? (
+                      <div className="space-y-6">
+                        <p className="text-xs text-zinc-500 font-medium leading-relaxed uppercase tracking-wide">Enter your verified provider ID to receive a session-specific cryptographic token.</p>
+                        <button 
+                          onClick={requestOtp} 
+                          disabled={loading || !doctorId.trim()} 
+                          className="w-full bg-white text-zinc-950 h-14 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-zinc-100 transition-all shadow-[0_0_30px_rgba(255,255,255,0.05)]"
+                        >
+                          {loading ? 'Dispersing Key...' : 'Request Clinical Key'}
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="space-y-10">
+                        <input
+                          type="text"
+                          placeholder="000000"
+                          value={otp}
+                          onChange={e => setOtp(e.target.value)}
+                          className="w-full bg-transparent border-b-4 border-zinc-800 text-center text-white font-mono text-5xl tracking-[0.4em] outline-none focus:border-cyan-500 transition-all placeholder-zinc-900"
+                          maxLength={6}
+                        />
+                        <button 
+                          onClick={verifyOtp} 
+                          disabled={loading || otp.length < 6} 
+                          className="w-full bg-cyan-500 text-zinc-950 h-14 rounded-2xl font-black text-xs uppercase tracking-widest hover:opacity-90 shadow-[0_0_30px_rgba(34,211,238,0.3)] transition-all"
+                        >
+                          {loading ? 'Validating Signature...' : 'Finalize Handshake'}
+                        </button>
+                        
+                        <div className="flex justify-between items-center w-full px-2">
+                          <button onClick={requestOtp} disabled={loading} className="text-[10px] font-black text-zinc-500 uppercase tracking-widest hover:text-white transition">Resend</button>
+                          <button onClick={() => { setOtpSent(false); setOtp(''); }} disabled={loading} className="text-[10px] font-black text-zinc-500 uppercase tracking-widest hover:text-white transition">Reset ID</button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          <div className="pt-10 text-center space-y-6">
+            <Link 
+              href="/doctor/register" 
+              className="group inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:text-cyan-400 transition-colors"
+            >
+              New to AyushAlert? <span className="text-zinc-400 group-hover:text-cyan-300 border-b border-zinc-800 group-hover:border-cyan-900 pb-0.5 transition-all">Register institutional terminal</span>
+            </Link>
+            
+            <p className="text-[9px] font-black uppercase tracking-widest text-zinc-700 leading-loose">
+              SYSTEM PROPERTY: ACCESS LOGGED & AUDITED · HIPAA/ABDM COMPLIANT SECURED TERMINAL
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

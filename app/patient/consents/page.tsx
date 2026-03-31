@@ -213,7 +213,7 @@ export default function PatientConsents() {
                   <div className="mb-4 bg-gray-50 p-4 rounded border">
                       <p className="font-semibold text-gray-700 mb-2">Select records to share:</p>
                       {records.length === 0 ? (
-                          <p className="text-sm text-red-500 italic">You have no uploaded records to share.</p>
+                          <p className="text-sm text-red-500">You have no uploaded records to share.</p>
                       ) : (
                           <div className="space-y-2 max-h-40 overflow-y-auto">
                               {records.map(record => (
