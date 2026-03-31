@@ -123,9 +123,29 @@ export default function EMRDashboard() {
   const [dosage, setDosage] = useState('');
   const [showPreview, setShowPreview] = useState(false);
   const [logoUrl, setLogoUrl] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true); // Initialize loading as true
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
+  const [authenticated, setAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const hospitalToken = sessionStorage.getItem('portal_api_key');
+    const doctorToken = localStorage.getItem('doctor_token');
+    
+    if (!hospitalToken && !doctorToken) {
+      router.push('/hospital/login');
+      return;
+    }
+    
+    setAuthenticated(true);
+    setLoading(false);
+  }, [router]);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('portal_api_key');
+    localStorage.removeItem('doctor_token');
+    router.push('/hospital/login');
+  };
 
   const handleLogoUpload = (e: any) => {
     const file = e.target.files?.[0]; if (!file) return;
@@ -139,9 +159,10 @@ export default function EMRDashboard() {
     if (!diagnosis && !symptoms && !medicines) { setError('Clinical parameters required.'); return; }
     setLoading(true); setError(''); setSuccess('');
     try {
+      const hospitalToken = sessionStorage.getItem('portal_api_key') || 'demo_hospital_key_2024';
       const res = await fetch('/api/hospital/ingest', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'x-api-key': 'demo_hospital_key_2024' },
+        headers: { 'Content-Type': 'application/json', 'x-api-key': hospitalToken },
         body: JSON.stringify({ abha_id: patientId, patient_email: patientEmail, records: [{ diagnosis: diagnosis.split(','), symptoms: symptoms.split(','), medicines: medicines.split(','), dosage: dosage.split(','), doctor: `${doctorName} — ${hospitalName}`, file_name: `${docType} - ${new Date().toLocaleDateString()}` }] }),
       });
       if (!res.ok) throw new Error('Ingestion failed');
@@ -150,6 +171,8 @@ export default function EMRDashboard() {
     } catch (err: any) { setError(err.message); }
     finally { setLoading(false); }
   };
+
+  if (!authenticated) return null;
 
   return (
     <div className="min-h-screen bg-zinc-950 flex flex-col relative overflow-hidden">
@@ -177,16 +200,15 @@ export default function EMRDashboard() {
                <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-0.5">Sovereign clinical identity Management</p>
             </div>
           </div>
-          <div className="flex flex-wrap items-center justify-center gap-4 w-full lg:w-auto">
-             <Link href="/" className="px-5 py-3 rounded-xl bg-zinc-800/50 border border-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition flex-1 sm:flex-none text-center">Home</Link>
-             <Link href="/dashboard" className="px-5 py-3 rounded-xl bg-zinc-800/50 border border-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition flex-1 sm:flex-none text-center flex items-center justify-center gap-2">
-                <LayoutDashboard size={14} /> Dashboard
-             </Link>
-             <div className="px-5 py-3 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-[9px] font-black uppercase tracking-widest text-indigo-400 flex items-center justify-center gap-2 flex-1 sm:flex-none">
-                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Node Verified
-             </div>
-          </div>
-        </motion.nav>
+           <div className="flex flex-wrap items-center justify-center gap-4 w-full lg:w-auto">
+              <Link href="/" className="px-5 py-3 rounded-xl bg-zinc-800/50 border border-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition flex-1 sm:flex-none text-center">Home</Link>
+              <div className="px-5 py-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-[9px] font-black uppercase tracking-widest text-emerald-400 flex items-center justify-center gap-2 flex-1 sm:flex-none">
+                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Node Verified
+              </div>
+              <button onClick={handleLogout} className="px-5 py-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-rose-400 hover:bg-rose-500/20 transition flex-1 sm:flex-none text-center">Terminate</button>
+              <Link href="/dashboard" className="px-5 py-3 rounded-xl bg-zinc-800/50 border border-white/5 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition flex-1 sm:flex-none text-center">Dashboard</Link>
+           </div>
+         </motion.nav>
 
         {/* FEEDBACK BANNERS */}
         <AnimatePresence>

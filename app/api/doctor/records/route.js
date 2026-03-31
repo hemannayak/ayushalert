@@ -5,10 +5,29 @@ import Consent from '../../../../models/Consent.js';
 
 export async function GET(req) {
   try {
+    const authHeader = req.headers.get('authorization');
     const apiKey = req.headers.get('x-api-key');
+
+    let isAuthorized = false;
+
+    // Option 1: Legacy x-api-key (Hospital/Demo)
     const HOSPITAL_API_KEY = process.env.HOSPITAL_API_KEY || 'demo_hospital_key_2024';
-    if (apiKey !== HOSPITAL_API_KEY) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (apiKey === HOSPITAL_API_KEY) {
+      isAuthorized = true;
+    }
+
+    // Option 2: Bearer Token (Doctor JWT)
+    if (!isAuthorized && authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.split(' ')[1];
+      const { verifyToken } = await import('../../../../utils/jwt.js');
+      const decoded = verifyToken(token);
+      if (decoded && decoded.doctor_id) {
+        isAuthorized = true;
+      }
+    }
+
+    if (!isAuthorized) {
+      return NextResponse.json({ error: 'Unauthorized: Missing or invalid credentials' }, { status: 401 });
     }
 
     const { searchParams } = new URL(req.url);

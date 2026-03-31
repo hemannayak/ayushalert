@@ -88,6 +88,7 @@ export default function Dashboard() {
            </div>
            <div className="flex flex-wrap items-center justify-center gap-4 w-full lg:w-auto">
               <Link href="/" className="px-5 py-3 rounded-xl bg-zinc-800/50 border border-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition flex-1 sm:flex-none text-center">Home</Link>
+              <Link href="/dashboard" className="px-5 py-3 rounded-xl bg-zinc-800/50 border border-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition flex-1 sm:flex-none text-center">Dashboard</Link>
               <button onClick={handleLogout} className="px-5 py-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-[10px] font-black uppercase tracking-widest text-rose-400 hover:bg-rose-500/20 transition flex-1 sm:flex-none text-center">Session Termination</button>
            </div>
         </motion.nav>

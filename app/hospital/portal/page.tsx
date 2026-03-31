@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { BrandLogo } from '@/components/BrandLogo';
@@ -8,9 +9,7 @@ import { Shield, Key, Database, Activity, Lock, ArrowRight, Building2, Globe, St
 // ── SESSION HELPERS ──────────────────────────────────────────────────────────
 function getInitialApiKey() {
   if (typeof window === 'undefined') return '';
-  const fromLogin = sessionStorage.getItem('portal_api_key');
-  if (fromLogin) { sessionStorage.removeItem('portal_api_key'); return fromLogin; }
-  return 'demo_hospital_key_2024';
+  return sessionStorage.getItem('portal_api_key') || '';
 }
 function getInitialAuthStep(): 'enter' | 'authenticated' {
   if (typeof window === 'undefined') return 'enter';
@@ -80,6 +79,7 @@ const EMPTY_RECORD = {
 
 // ── MAIN COMPONENT ──────────────────────────────────────────────────────────
 export default function HospitalSyncPortal() {
+  const router = useRouter();
   const [apiKey, setApiKey]         = useState(getInitialApiKey);
   const [authStep, setAuthStep]     = useState<'enter' | 'authenticated'>(getInitialAuthStep);
   const [authError, setAuthError]   = useState('');
@@ -106,6 +106,10 @@ export default function HospitalSyncPortal() {
   const today        = new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' });
 
   useEffect(() => {
+    if (!apiKey) {
+      router.push('/hospital/login');
+      return;
+    }
     if (authStep !== 'authenticated') return;
     setLoadingHosp(true);
     fetch('/api/hospital/list')
@@ -113,7 +117,7 @@ export default function HospitalSyncPortal() {
       .then(d => setHospitals(d.hospitals || []))
       .catch(() => setHospitals([]))
       .finally(() => setLoadingHosp(false));
-  }, [authStep]);
+  }, [authStep, apiKey, router]);
 
   // Handlers
   const applyTemplate = (tmpl: any) => {
@@ -279,17 +283,27 @@ export default function HospitalSyncPortal() {
                  </div>
                  <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest">Sovereign institutional hub</p>
           </div>
-          <div className="flex items-center gap-6">
-             <div className="text-right">
-                <p className="text-[10px] font-black uppercase text-zinc-600">Facility Cluster</p>
-                {hospitals.length > 0 ? (
-                  <select value={selectedHospIdx} onChange={e => setHospIdx(Number(e.target.value))} className="bg-zinc-800/80 border border-white/5 rounded-xl px-4 py-2 text-sm font-bold text-white outline-none">
-                    {hospitals.map((h, i) => <option key={h.hospital_id} value={i} className="bg-zinc-900">{h.name}</option>)}
-                  </select>
-                ) : <p className="text-sm font-bold text-zinc-500">Standalone Node</p>}
-             </div>
-             <button onClick={() => setAuthStep('enter')} className="p-3 rounded-xl bg-zinc-800/50 border border-white/5 text-zinc-500 hover:text-white transition"><Lock size={18} /></button>
-          </div>
+           <div className="flex items-center gap-6">
+              <div className="hidden lg:flex items-center gap-3 pr-6 border-r border-white/5">
+                 <Link href="/" className="px-5 py-3 rounded-xl bg-zinc-800/50 border border-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition">Home</Link>
+                 <Link href="/dashboard" className="px-5 py-3 rounded-xl bg-zinc-800/50 border border-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition">Dashboard</Link>
+              </div>
+              <div className="text-right">
+                 <p className="text-[10px] font-black uppercase text-zinc-600">Facility Cluster</p>
+                 {hospitals.length > 0 ? (
+                   <select value={selectedHospIdx} onChange={e => setHospIdx(Number(e.target.value))} className="bg-zinc-800/80 border border-white/5 rounded-xl px-4 py-2 text-sm font-bold text-white outline-none">
+                     {hospitals.map((h, i) => <option key={h.hospital_id} value={i} className="bg-zinc-900">{h.name}</option>)}
+                   </select>
+                 ) : <p className="text-sm font-bold text-zinc-500">Standalone Node</p>}
+              </div>
+              <button 
+                onClick={() => { sessionStorage.removeItem('portal_api_key'); setAuthStep('enter'); }} 
+                className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-rose-500 hover:text-rose-400 transition" 
+                title="Log out and clear terminal session"
+              >
+                <Lock size={18} />
+              </button>
+           </div>
         </motion.div>
 
         {/* ALERTS */}

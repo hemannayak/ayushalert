@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BrandLogo } from '@/components/BrandLogo';
 import { Activity, Globe, Shield, BarChart3, AlertTriangle, RefreshCcw, LayoutDashboard, Database, TrendingUp, Map as MapIcon, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
@@ -102,9 +103,29 @@ function MetricCard({ icon, label, value, sub, accent = 'indigo', isString = fal
 
 // ── MAIN DASHBOARD ───────────────────────────────────────────────────────────
 export default function AnalyticsDashboard() {
+  const router = useRouter();
   const [data, setData] = useState<AnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [authenticated, setAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const hospitalToken = sessionStorage.getItem('portal_api_key');
+    const doctorToken = localStorage.getItem('doctor_token');
+    
+    if (!hospitalToken && !doctorToken) {
+      router.push('/hospital/login');
+      return;
+    }
+    
+    setAuthenticated(true);
+  }, [router]);
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('portal_api_key');
+    localStorage.removeItem('doctor_token');
+    router.push('/hospital/login');
+  };
   const [period, setPeriod] = useState<'24h' | '7d' | '30d'>('24h');
   const [filterSymptom, setFilter] = useState('');
   const [filterRegion, setRegion] = useState('');
@@ -150,6 +171,8 @@ export default function AnalyticsDashboard() {
     finally { setSimulating(false); }
   };
 
+  if (!authenticated) return null;
+
   if (loading) return (
     <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center space-y-4">
       <div className="w-12 h-12 border-4 border-indigo-500/20 border-t-indigo-500 rounded-full animate-spin" />
@@ -194,10 +217,9 @@ export default function AnalyticsDashboard() {
                <Link href="/dashboard" className="px-5 py-3 rounded-xl bg-zinc-800/50 border border-white/5 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition flex-1 sm:flex-none text-center flex items-center justify-center gap-2">
                  <LayoutDashboard size={14} /> Dashboard
                </Link>
-               <button onClick={() => fetchData()} className="px-5 py-3 rounded-xl bg-zinc-800/50 border border-white/5 text-[10px] font-black uppercase tracking-[0.2em] text-white hover:bg-zinc-800 transition flex items-center justify-center gap-2 flex-1 sm:flex-none"><RefreshCcw size={14} /> Refresh</button>
-               <button onClick={handleSimulate} disabled={simulating} className="px-5 py-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-rose-400 transition flex-1 sm:flex-none text-center">{simulating ? 'Processing...' : 'Simulate Outbreak'}</button>
-            </div>
-        </motion.div>
+                <button onClick={handleLogout} className="px-5 py-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-rose-400 hover:bg-rose-500/20 transition flex-1 sm:flex-none text-center">Terminate</button>
+             </div>
+         </motion.div>
 
         {simMsg && <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 text-xs font-black uppercase tracking-widest animate-pulse">{simMsg}</div>}
 

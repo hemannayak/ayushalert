@@ -126,7 +126,7 @@ export default function DoctorDashboard() {
           if (res.ok) {
             const data = await res.json();
             if (data.status === 'approved') {
-               const recRes = await fetch(`/api/doctor/records?patient_id=${scannedPatientId}&request_id=${consentRequestId}`, { headers: { 'x-api-key': 'demo_hospital_key_2024' } });
+               const recRes = await fetch(`/api/doctor/records?patient_id=${scannedPatientId}&request_id=${consentRequestId}`, { headers: { Authorization: `Bearer ${token}` } });
                if (recRes.ok) setPatientRecords(await recRes.json());
                setStep(3); setTimeLeft(600);
             } else if (data.status === 'rejected') { setStep(1); }
@@ -173,6 +173,7 @@ export default function DoctorDashboard() {
            </div>
            <div className="flex flex-wrap items-center justify-center gap-4 w-full lg:w-auto">
               <Link href="/" className="px-5 py-3 rounded-xl bg-zinc-800/50 border border-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition flex-1 sm:flex-none text-center">Home</Link>
+              <Link href="/dashboard" className="px-5 py-3 rounded-xl bg-zinc-800/50 border border-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition flex-1 sm:flex-none text-center">Dashboard</Link>
               <button onClick={handleLogout} className="px-5 py-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-[10px] font-black uppercase tracking-widest text-rose-400 hover:bg-rose-500/20 transition flex-1 sm:flex-none text-center">Terminate Session</button>
            </div>
         </motion.div>

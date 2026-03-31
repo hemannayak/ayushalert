@@ -126,12 +126,12 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                  </svg>
               </div>
-              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2 tracking-tight">EMR / EHR</h2>
+              <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2 tracking-tight flex items-center gap-2">EMR <span className="text-[10px] bg-rose-500/10 text-rose-500 px-1.5 py-0.5 rounded uppercase tracking-tighter">Secure</span></h2>
               <p className="text-zinc-600 dark:text-zinc-500 text-xs mb-8 flex-grow leading-relaxed">
-                 Clinical Charting Interface. Doctors map prescriptions, symptoms, and diagnoses directly to the ledger.
+                 Clinical Charting Interface. Doctors map prescriptions and diagnoses directly to the sovereign health ledger.
               </p>
               <div className="flex flex-col w-full mt-auto">
-                 <Link href="/emr" className="w-full py-2.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-black font-medium text-xs text-center rounded-lg transition-colors">
+                 <Link href="/emr" className="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs text-center rounded-lg transition-colors">
                     Provider Terminal
                  </Link>
               </div>
