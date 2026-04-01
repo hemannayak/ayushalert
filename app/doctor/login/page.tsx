@@ -47,6 +47,10 @@ export default function DoctorLogin() {
 
   const startCamera = async () => {
     if (!modelsLoaded) return;
+    if (!doctorId.trim()) {
+      setError("Please enter your Doctor ID first before scanning.");
+      return;
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       if (videoRef.current) {
@@ -133,7 +137,7 @@ export default function DoctorLogin() {
       localStorage.setItem('doctor_token', data.token);
       localStorage.setItem('doctor_id', data.doctor_id);
       
-      setSuccess('Biometric Signature Verified. Entering portal...');
+      setSuccess('Identity verified. Entering dashboard...');
       
       setTimeout(() => {
           router.push('/doctor/dashboard');
@@ -223,11 +227,11 @@ export default function DoctorLogin() {
             <div className="space-y-4">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-violet-400">
                 <Stethoscope size={12} strokeWidth={3} />
-                Clinical Authority
+                Secure Login
               </div>
               <h1 className="text-5xl font-extrabold tracking-tighter leading-[0.85] text-white uppercase">
-                Provider <br /> 
-                <span className="text-zinc-600">Terminal.</span>
+                Doctor <br /> 
+                <span className="text-zinc-600">Login.</span>
               </h1>
             </div>
           </motion.div>
@@ -238,7 +242,7 @@ export default function DoctorLogin() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            Access your unified clinical dashboard to manage patient synchronization, verify EMR protocols, and establish secure health handshakes.
+            Access your dashboard to manage patients, view medical records, and connect with other specialists securely.
           </motion.p>
         </div>
 
@@ -249,9 +253,9 @@ export default function DoctorLogin() {
           transition={{ delay: 0.5 }}
         >
           {[
-            { label: 'Network', value: 'Institutional' },
+            { label: 'Network', value: 'Secure' },
             { label: 'Uptime', value: '99.99%' },
-            { label: 'Standard', value: 'ABDM-V3' },
+            { label: 'Standard', value: 'Verified' },
           ].map((stat, i) => (
             <div key={i} className="space-y-1">
               <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">{stat.label}</p>
@@ -269,16 +273,16 @@ export default function DoctorLogin() {
           <div className="lg:hidden flex justify-center mb-8">
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <BrandLogo variant="horizontal" size={32} />
-              <span className="px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-[10px] font-black uppercase tracking-widest text-violet-400">Clinical Terminal</span>
+              <span className="px-3 py-1 rounded-full bg-violet-500/10 border border-violet-500/20 text-[10px] font-black uppercase tracking-widest text-violet-400">Doctor Portal</span>
             </div>
           </div>
 
           <div className="space-y-3">
              <h2 className="text-2xl font-bold tracking-tight text-white flex items-center gap-3">
-                Institutional Login
+                Secure Login
                 <span className="text-[10px] bg-zinc-900 border border-zinc-800 text-zinc-500 px-2 py-1 rounded">V4.0</span>
              </h2>
-             <p className="text-zinc-500 text-sm font-medium font-mono uppercase tracking-tight">System: provider_auth_orchestrator</p>
+             <p className="text-zinc-500 text-sm font-medium font-mono uppercase tracking-tight">System: Secure Login</p>
           </div>
 
           <AnimatePresence mode="wait">
@@ -303,7 +307,7 @@ export default function DoctorLogin() {
                 <div className="relative group">
                   <div className="absolute inset-0 bg-cyan-500/5 blur-2xl group-focus-within:bg-cyan-500/10 transition-colors" />
                   <div className="relative">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 block mb-2 px-1">Clinical License / Provider ID</label>
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 block mb-2 px-1">Your Doctor ID</label>
                     <input 
                       required 
                       placeholder="DOC_••••••••"
@@ -319,10 +323,10 @@ export default function DoctorLogin() {
                 {!otpSent && (
                   <div className="flex bg-zinc-900/80 p-1.5 rounded-2xl border border-zinc-800/80 shadow-inner">
                     <button onClick={() => setLoginMethod('face')} className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${loginMethod === 'face' ? 'bg-zinc-800 text-cyan-400 shadow-xl border border-white/5' : 'text-zinc-500 hover:text-zinc-300'}`}>
-                      <Fingerprint size={14} /> Biometrics
+                      <Fingerprint size={14} /> Face Scan
                     </button>
                     <button onClick={() => { setLoginMethod('otp'); stopCamera(); }} className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${loginMethod === 'otp' ? 'bg-zinc-800 text-cyan-400 shadow-xl border border-white/5' : 'text-zinc-500 hover:text-zinc-300'}`}>
-                      <Mail size={14} /> Digital Key
+                      <Mail size={14} /> Login Code
                     </button>
                   </div>
                 )}
@@ -335,15 +339,14 @@ export default function DoctorLogin() {
                     {!modelsLoaded && (
                       <div className="flex flex-col items-center gap-3">
                         <Activity className="text-indigo-400 animate-pulse" size={32} />
-                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Loading Clinical Neural Nets...</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Loading...</p>
                       </div>
                     )}
                     
                     {modelsLoaded && !cameraActive && (
                       <button 
                         onClick={startCamera} 
-                        disabled={!doctorId.trim()}
-                        className="h-16 w-16 rounded-full bg-cyan-500 text-zinc-950 flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:opacity-30 shadow-[0_0_30px_rgba(34,211,238,0.4)]"
+                        className="h-16 w-16 rounded-full bg-cyan-500 text-zinc-950 flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-[0_0_30px_rgba(34,211,238,0.4)]"
                       >
                         <Fingerprint size={32} />
                       </button>
@@ -354,14 +357,14 @@ export default function DoctorLogin() {
                       autoPlay 
                       muted 
                       playsInline
-                      className={`w-full h-full object-cover transition-opacity duration-700 ${!cameraActive ? 'opacity-0' : 'opacity-100'}`}
+                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${!cameraActive ? 'opacity-0' : 'opacity-100'}`}
                     />
 
                     {cameraActive && (
                       <ScannerOverlay 
                         status={loading ? 'verifying' : countdown !== null ? 'verifying' : 'scanning'}
                         countdown={countdown}
-                        label={loading ? "Analyzing Credential Vector" : "Live Feed: Secure"} 
+                        label={loading ? "Verifying..." : "Align your face"} 
                       />
                     )}
                   </div>
@@ -369,13 +372,13 @@ export default function DoctorLogin() {
                   <div className="p-8 rounded-2xl border border-zinc-800/80 bg-zinc-900/30 text-center space-y-8 shadow-2xl">
                     {!otpSent ? (
                       <div className="space-y-6">
-                        <p className="text-xs text-zinc-500 font-medium leading-relaxed uppercase tracking-wide">Enter your verified provider ID to receive a session-specific cryptographic token.</p>
+                        <p className="text-xs text-zinc-500 font-medium leading-relaxed uppercase tracking-wide">Enter your Doctor ID to get a 6-digit login code.</p>
                         <button 
                           onClick={requestOtp} 
                           disabled={loading || !doctorId.trim()} 
                           className="w-full bg-white text-zinc-950 h-14 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-zinc-100 transition-all shadow-[0_0_30px_rgba(255,255,255,0.05)]"
                         >
-                          {loading ? 'Dispersing Key...' : 'Request Clinical Key'}
+                          {loading ? 'Sending code...' : 'Get Code'}
                         </button>
                       </div>
                     ) : (
@@ -393,7 +396,7 @@ export default function DoctorLogin() {
                           disabled={loading || otp.length < 6} 
                           className="w-full bg-cyan-500 text-zinc-950 h-14 rounded-2xl font-black text-xs uppercase tracking-widest hover:opacity-90 shadow-[0_0_30px_rgba(34,211,238,0.3)] transition-all"
                         >
-                          {loading ? 'Validating Signature...' : 'Finalize Handshake'}
+                          {loading ? 'Verifying...' : 'Login'}
                         </button>
                         
                         <div className="flex justify-between items-center w-full px-2">
@@ -413,11 +416,11 @@ export default function DoctorLogin() {
               href="/doctor/register" 
               className="group inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-zinc-500 hover:text-cyan-400 transition-colors"
             >
-              New to AyushAlert? <span className="text-zinc-400 group-hover:text-cyan-300 border-b border-zinc-800 group-hover:border-cyan-900 pb-0.5 transition-all">Register institutional terminal</span>
+              New to AyushAlert? <span className="text-zinc-400 group-hover:text-cyan-300 border-b border-zinc-800 group-hover:border-cyan-900 pb-0.5 transition-all">Sign Up Now</span>
             </Link>
             
             <p className="text-[9px] font-black uppercase tracking-widest text-zinc-700 leading-loose">
-              SYSTEM PROPERTY: ACCESS LOGGED & AUDITED · HIPAA/ABDM COMPLIANT SECURED TERMINAL
+              SECURE DOCTOR PORTAL
             </p>
           </div>
         </div>

@@ -93,7 +93,7 @@ export default function PatientConsents() {
 
   const submitOTPApproval = async () => {
       if (!otp.trim() || otp.length < 6) {
-          alert("Please enter the 6-digit OTP sent to your email.");
+          alert("Please enter the 6-digit verification code sent to your email.");
           return;
       }
 
@@ -116,7 +116,7 @@ export default function PatientConsents() {
         });
         const data = await res.json();
   
-        if (!res.ok) throw new Error(data.error || 'Failed to verify OTP');
+        if (!res.ok) throw new Error(data.error || 'Failed to verify code');
         
         // Reset states
         setActiveRequest(null);
@@ -166,12 +166,12 @@ export default function PatientConsents() {
 
   return (
     <div className="max-w-4xl mx-auto mt-10">
-      <h2 className="text-2xl font-bold mb-6 text-gray-800">Manage Hospital Access Consents</h2>
+      <h2 className="text-2xl font-bold mb-6 text-gray-800">Manage Hospital Access</h2>
       
       {error && <div className="bg-red-100 text-red-700 p-3 rounded mb-4">{error}</div>}
 
       <div className="mb-10">
-        <h3 className="text-xl font-bold mb-4 text-orange-600 border-b pb-2">Pending Requests</h3>
+        <h3 className="text-xl font-bold mb-4 text-orange-600 border-b pb-2">New Access Requests</h3>
         {pendingRequests.length === 0 ? (
           <p className="text-gray-500 bg-gray-50 p-4 rounded text-center">No pending requests.</p>
         ) : (
@@ -182,8 +182,8 @@ export default function PatientConsents() {
                   {/* OTP MODAL OVERLAY */}
                   {activeRequest === req.request_id && otpSent && (
                       <div className="absolute inset-0 bg-white/95 backdrop-blur-sm z-10 p-6 flex flex-col justify-center items-center rounded-xl border border-gray-200 shadow-inner">
-                          <h4 className="text-xl font-bold text-gray-800 mb-2">Verify Your Identity</h4>
-                          <p className="text-sm text-gray-600 mb-4 text-center">We have sent a 6-digit OTP to your registered email.<br/>(For this demo, check the Next.js Terminal console!)</p>
+                          <h4 className="text-xl font-bold text-gray-800 mb-2">Confirm it's You</h4>
+                          <p className="text-sm text-gray-600 mb-4 text-center">We've sent a 6-digit verification code to your email.<br/>(For this demo, check the Next.js Terminal console!)</p>
                           <input 
                               type="text" 
                               maxLength={6}
@@ -195,7 +195,7 @@ export default function PatientConsents() {
                           <div className="flex space-x-3">
                               <button onClick={() => {setActiveRequest(null); setOtpSent(false)}} className="bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded">Cancel</button>
                               <button onClick={submitOTPApproval} disabled={processingId === req.request_id} className="bg-green-600 hover:bg-green-700 text-white font-bold px-6 py-2 rounded disabled:opacity-50">
-                                {processingId === req.request_id ? 'Verifying...' : 'Confirm Approval'}
+                                {processingId === req.request_id ? 'Verifying...' : 'Approve Access'}
                               </button>
                           </div>
                       </div>
@@ -207,7 +207,7 @@ export default function PatientConsents() {
                           <p className="text-lg font-bold text-gray-800 mt-1">Hospital: {req.hospital_id}</p>
                           <p className="text-sm text-gray-600 mt-2">Requested on: {new Date(req.created_at).toLocaleDateString()}</p>
                       </div>
-                      <span className="bg-orange-100 text-orange-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Action Required</span>
+                      <span className="bg-orange-100 text-orange-800 text-xs font-bold px-3 py-1 rounded-full uppercase">Requires Your Permission</span>
                   </div>
 
                   <div className="mb-4 bg-gray-50 p-4 rounded border">
@@ -238,14 +238,14 @@ export default function PatientConsents() {
                         disabled={processingId === req.request_id || records.length === 0}
                         className="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded shadow transition disabled:bg-gray-400"
                       >
-                        {processingId === req.request_id ? 'Processing...' : 'Approve & Send OTP'}
+                        {processingId === req.request_id ? 'Processing...' : 'Send Verification Code'}
                       </button>
                       <button 
                         onClick={() => handleReject(req.request_id)} 
                         disabled={processingId === req.request_id}
                         className="bg-red-100 hover:bg-red-200 text-red-700 font-semibold py-2 px-6 rounded transition disabled:opacity-50"
                       >
-                        Reject Request
+                        Decline Request
                       </button>
                   </div>
               </div>
@@ -255,7 +255,7 @@ export default function PatientConsents() {
       </div>
 
       <div>
-        <h3 className="text-xl font-bold mb-4 text-gray-600 border-b pb-2">Past Requests</h3>
+        <h3 className="text-xl font-bold mb-4 text-gray-600 border-b pb-2">History</h3>
         {pastRequests.length === 0 ? (
            <p className="text-gray-500">No past requests.</p>
         ) : (

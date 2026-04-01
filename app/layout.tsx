@@ -13,6 +13,7 @@ export const metadata: Metadata = {
   description: "A premium decentralized healthcare system",
 };
 
+import { Analytics } from "@vercel/analytics/next";
 import { Footer } from "@/components/Footer";
 
 export default function RootLayout({
@@ -33,6 +34,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
+          <Analytics />
           <Footer />
         </ThemeProvider>
       </body>

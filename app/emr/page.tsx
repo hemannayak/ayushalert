@@ -3,7 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { BrandLogo } from '@/components/BrandLogo';
-import { Shield, Key, FileText, Printer, Save, CheckCircle2, AlertCircle, LayoutDashboard, Database, Activity, User, Mail, Building2, Stethoscope, ArrowRight, ChevronRight } from 'lucide-react';
+import { Shield, Key, FileText, Printer, Save, CheckCircle2, AlertCircle, LayoutDashboard, Database, Activity, User, Mail, Building2, Stethoscope, ArrowRight, ChevronRight, PackageOpen } from 'lucide-react';
 import Link from 'next/link';
 
 // ── TYPES ──────────────────────────────────────────────────────────────────
@@ -25,7 +25,7 @@ function A4Preview({
       <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 bg-zinc-900/80 border border-white/5 backdrop-blur-xl px-6 py-3 rounded-2xl shadow-2xl">
          <button onClick={onClose} className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition">✕ Close</button>
          <div className="w-px h-4 bg-white/5" />
-         <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Institutional A4 Preview</span>
+         <span className="text-[10px] font-black uppercase tracking-widest text-indigo-400">Hospital Preview</span>
          <div className="w-px h-4 bg-white/5" />
          <button onClick={onPrint} className="text-[10px] font-black uppercase tracking-widest text-white hover:text-indigo-300 transition flex items-center gap-2"><Printer size={14} /> Print / Save PDF</button>
       </div>
@@ -50,7 +50,7 @@ function A4Preview({
 
             <div className="grid grid-cols-3 gap-6 bg-zinc-50 border border-zinc-100 p-6 rounded-xl mb-10">
                <div className="space-y-1">
-                  <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Universal ABHA Identifier</p>
+                  <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Patient ID</p>
                   <p className="text-xs font-black font-mono">{patientId || '—'}</p>
                </div>
                <div className="space-y-1">
@@ -58,8 +58,8 @@ function A4Preview({
                   <p className="text-xs font-bold">{patientEmail || '—'}</p>
                </div>
                <div className="text-right space-y-1">
-                  <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Security Profile</p>
-                  <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Verified Infrastructure</p>
+                  <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Security Status</p>
+                  <p className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Verified & Secure</p>
                </div>
             </div>
 
@@ -121,19 +121,26 @@ export default function EMRDashboard() {
   const [symptoms, setSymptoms] = useState('');
   const [medicines, setMedicines] = useState('');
   const [dosage, setDosage] = useState('');
+  const [billingAmount, setBillingAmount] = useState('500');
   const [showPreview, setShowPreview] = useState(false);
   const [logoUrl, setLogoUrl] = useState('');
-  const [loading, setLoading] = useState(true); // Initialize loading as true
+  const [loading, setLoading] = useState(true); 
   const [success, setSuccess] = useState('');
   const [error, setError] = useState('');
   const [authenticated, setAuthenticated] = useState(false);
+  
+  const [drawerOpen, setDrawerOpen] = useState(false);
 
   useEffect(() => {
     const hospitalToken = sessionStorage.getItem('portal_api_key');
     const doctorToken = localStorage.getItem('doctor_token');
     
+    // Auto-Sync Logged-in Hospital Identity
+    const storedHospName = sessionStorage.getItem('hospital_name') || localStorage.getItem('hospital_name');
+    if (storedHospName) setHospitalName(storedHospName);
+    
     if (!hospitalToken && !doctorToken) {
-      router.push('/hospital/login');
+      router.push('/emr/login');
       return;
     }
     
@@ -144,13 +151,7 @@ export default function EMRDashboard() {
   const handleLogout = () => {
     sessionStorage.removeItem('portal_api_key');
     localStorage.removeItem('doctor_token');
-    router.push('/hospital/login');
-  };
-
-  const handleLogoUpload = (e: any) => {
-    const file = e.target.files?.[0]; if (!file) return;
-    const reader = new FileReader(); reader.onload = () => setLogoUrl(reader.result as string);
-    reader.readAsDataURL(file);
+    router.push('/emr/login');
   };
 
   const handleSubmit = async (e: any) => {
@@ -163,10 +164,22 @@ export default function EMRDashboard() {
       const res = await fetch('/api/hospital/ingest', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-api-key': hospitalToken },
-        body: JSON.stringify({ abha_id: patientId, patient_email: patientEmail, records: [{ diagnosis: diagnosis.split(','), symptoms: symptoms.split(','), medicines: medicines.split(','), dosage: dosage.split(','), doctor: `${doctorName} — ${hospitalName}`, file_name: `${docType} - ${new Date().toLocaleDateString()}` }] }),
+        body: JSON.stringify({ 
+          abha_id: patientId, 
+          patient_email: patientEmail, 
+          billing_amount: parseFloat(billingAmount) || 0,
+          records: [{ 
+            diagnosis: diagnosis.split(','), 
+            symptoms: symptoms.split(','), 
+            medicines: medicines.split(','), 
+            dosage: dosage.split(','), 
+            doctor: `${doctorName} — ${hospitalName}`, 
+            file_name: `${docType} - ${new Date().toLocaleDateString()}` 
+          }] 
+        }),
       });
       if (!res.ok) throw new Error('Ingestion failed');
-      setSuccess('EMR Node Propagated Successfully');
+      setSuccess('Record Saved Successfully');
       setDiagnosis(''); setSymptoms(''); setMedicines(''); setDosage('');
     } catch (err: any) { setError(err.message); }
     finally { setLoading(false); }
@@ -185,35 +198,86 @@ export default function EMRDashboard() {
 
       <A4Preview open={showPreview} onClose={()=>setShowPreview(false)} onPrint={()=>window.print()} patientId={patientId} patientEmail={patientEmail} doctorName={doctorName} hospitalName={hospitalName} docType={docType} symptoms={symptoms} diagnosis={diagnosis} medicines={medicines} dosage={dosage} logoUrl={logoUrl} />
 
+      {/* PHASE 2: INTELLIGENCE DRAWER (SIDEBAR) */}
+      <AnimatePresence>
+        {drawerOpen && (
+          <>
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setDrawerOpen(false)} className="fixed inset-0 bg-black/80 backdrop-blur-sm z-40" />
+            <motion.div initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: "spring", stiffness: 300, damping: 30 }} className="fixed top-0 right-0 h-full w-full max-w-md bg-zinc-950 border-l border-white/10 shadow-2xl z-50 flex flex-col pt-6 overflow-y-auto custom-scrollbar">
+               <div className="px-8 pb-6 border-b border-white/5 flex items-center justify-between sticky top-0 bg-zinc-950/90 backdrop-blur-xl z-10">
+                  <div className="flex items-center gap-3">
+                     <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400">
+                        <Activity size={20} />
+                     </div>
+                     <div>
+                        <h2 className="text-xl font-extrabold text-white tracking-tighter uppercase leading-none">Intelligence</h2>
+                        <span className="text-[9px] font-black text-indigo-400 uppercase tracking-[0.2em] mt-1 block">Live Operations Array</span>
+                     </div>
+                  </div>
+                  <button onClick={() => setDrawerOpen(false)} className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-500 hover:text-white transition">
+                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                  </button>
+               </div>
+
+               <div className="p-8 space-y-10">
+                  <div className="space-y-4">
+                     <div className="flex items-center gap-3">
+                        <div className="p-2 rounded-lg bg-orange-500/10 text-orange-400"><LayoutDashboard size={16} /></div>
+                        <h3 className="text-[11px] font-black text-orange-400 uppercase tracking-[0.2em]">Clinical Analysis</h3>
+                     </div>
+                     <div className="p-5 rounded-2xl bg-zinc-900/50 border border-zinc-800 space-y-4">
+                        <p className="text-[10px] uppercase font-bold text-zinc-500 tracking-widest">Encounter Yield Analysis</p>
+                        <div className="flex items-end gap-3">
+                           <span className="text-3xl font-black text-white leading-none">₹84.2K</span>
+                           <span className="text-[10px] font-bold text-orange-400 uppercase tracking-widest pb-1">+12% vs prior</span>
+                        </div>
+                     </div>
+                  </div>
+               </div>
+               
+               <div className="mt-auto p-8 border-t border-white/5 bg-zinc-950">
+                  <button onClick={() => setDrawerOpen(false)} className="w-full py-4 rounded-xl bg-zinc-900 text-white font-black uppercase tracking-widest text-[11px] hover:bg-zinc-800 transition">Close Panel</button>
+               </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+
       <div className="relative z-10 max-w-[1600px] mx-auto w-full px-6 lg:px-10 py-10 space-y-8 flex-1 flex flex-col">
         {/* HEADER */}
-        <motion.nav initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="rounded-3xl border border-white/5 bg-zinc-900/40 backdrop-blur-3xl p-6 flex flex-col lg:flex-row items-center justify-between gap-6 shadow-2xl">
-          <div className="flex flex-col sm:flex-row items-center gap-6 cursor-pointer" onClick={() => router.push('/')}>
-            <div className="w-14 h-14 rounded-2xl bg-zinc-900/50 flex items-center justify-center border border-indigo-500/10 shadow-2xl shrink-0">
+        <motion.nav initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="rounded-3xl border border-white/5 bg-zinc-900/40 backdrop-blur-3xl p-6 flex flex-col lg:flex-row items-center justify-between gap-6 shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-32 h-full bg-indigo-500/5 blur-3xl pointer-events-none" />
+          <div className="flex flex-col sm:flex-row items-center gap-6 cursor-pointer" onClick={() => { setSuccess('Console view reset'); setTimeout(()=>setSuccess(''), 2000); }}>
+            <div className="w-14 h-14 rounded-2xl bg-zinc-950 flex items-center justify-center border border-white/10 shadow-2xl shrink-0 group-hover:scale-105 transition-transform">
                <BrandLogo variant="icon" size={36} />
             </div>
             <div className="text-center sm:text-left">
                <div className="flex items-center justify-center sm:justify-start gap-3">
-                  <h1 className="text-xl font-extrabold tracking-tighter text-white">EMR Terminal</h1>
-                  <span className="px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[9px] font-black uppercase tracking-widest text-indigo-400">Clinical Tier</span>
+                  <h1 className="text-xl font-black tracking-tighter text-white uppercase">Institutional Health Node</h1>
+                  <span className="px-2 py-0.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[9px] font-black uppercase tracking-widest text-indigo-400">Security Active</span>
                </div>
-               <p className="text-[10px] text-zinc-500 font-bold uppercase tracking-widest mt-0.5">Sovereign clinical identity Management</p>
+               <p className="text-[9px] text-zinc-500 font-black uppercase tracking-widest mt-1.5 flex items-center gap-2">
+                 <Shield size={10} className="text-indigo-500" /> Unified Health Exchange protocol v4.0.2
+               </p>
             </div>
           </div>
-           <div className="flex flex-wrap items-center justify-center gap-4 w-full lg:w-auto">
-              <Link href="/" className="px-5 py-3 rounded-xl bg-zinc-800/50 border border-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition flex-1 sm:flex-none text-center">Home</Link>
-              <div className="px-5 py-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10 text-[9px] font-black uppercase tracking-widest text-emerald-400 flex items-center justify-center gap-2 flex-1 sm:flex-none">
-                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> Node Verified
-              </div>
-              <button onClick={handleLogout} className="px-5 py-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-rose-400 hover:bg-rose-500/20 transition flex-1 sm:flex-none text-center">Terminate</button>
-              <Link href="/dashboard" className="px-5 py-3 rounded-xl bg-zinc-800/50 border border-white/5 text-[10px] font-black uppercase tracking-[0.2em] text-zinc-400 hover:text-white transition flex-1 sm:flex-none text-center">Dashboard</Link>
+           <div className="flex flex-wrap items-center justify-center gap-4 w-full lg:w-auto relative z-10">
+              <Link href="/dashboard" className="px-5 py-3 rounded-xl bg-zinc-950/50 border border-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white transition group/nav flex items-center gap-2">
+                <ChevronRight size={14} className="rotate-180 group-hover/nav:text-indigo-400 transition-colors" /> Return to Access Ecosystem
+              </Link>
+              
+              <button onClick={() => setDrawerOpen(true)} className="px-5 py-3 rounded-xl bg-indigo-500/10 border border-indigo-500/30 text-[10px] font-black uppercase tracking-widest text-indigo-400 hover:bg-indigo-500/20 hover:text-indigo-300 transition flex items-center justify-center gap-3 flex-1 sm:flex-none shadow-[0_0_15px_rgba(99,102,241,0.1)]">
+                 <Activity size={14} className="animate-pulse" /> Live Analysis
+              </button>
+
+              <button onClick={handleLogout} className="px-5 py-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-rose-400 hover:bg-rose-500/20 transition flex-1 sm:flex-none text-center hidden md:block">Terminate Session</button>
            </div>
-         </motion.nav>
+        </motion.nav>
 
         {/* FEEDBACK BANNERS */}
         <AnimatePresence>
-          {error && <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity:1, scale:1 }} className="p-4 rounded-2xl bg-rose-500/5 border border-rose-500/20 text-rose-400 text-xs font-black uppercase flex items-center gap-3"><AlertCircle size={18} /> {error}</motion.div>}
-          {success && <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity:1, scale:1 }} className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 text-emerald-400 text-xs font-black uppercase flex items-center gap-3"><CheckCircle2 size={18} /> {success}</motion.div>}
+          {error && <motion.div key="err" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity:1, scale:1 }} exit={{ opacity:0 }} className="p-4 rounded-2xl bg-rose-500/5 border border-rose-500/20 text-rose-400 text-xs font-black uppercase flex items-center gap-3"><AlertCircle size={18} /> {error}</motion.div>}
+          {success && <motion.div key="succ" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity:1, scale:1 }} exit={{ opacity:0 }} className="p-4 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 text-emerald-400 text-xs font-black uppercase flex items-center gap-3"><CheckCircle2 size={18} /> {success}</motion.div>}
         </AnimatePresence>
 
         <div className="grid lg:grid-cols-12 gap-8 flex-1">
@@ -222,32 +286,27 @@ export default function EMRDashboard() {
             <div className="rounded-3xl border border-white/5 bg-zinc-900/50 p-8 space-y-6">
                <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400"><User size={20} /></div>
-                  <div><p className="text-[10px] font-black uppercase text-zinc-500 tracking-widest">Patient Resolver</p><p className="text-sm font-bold text-white uppercase">Identity Vector</p></div>
+                  <div><p className="text-[10px] font-black uppercase text-zinc-500 tracking-widest">Find Patient</p><p className="text-sm font-bold text-white uppercase">Search by ID</p></div>
                </div>
                <div className="space-y-4">
-                  <div className="space-y-2"><label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest px-1">Universal ABHA Identifier</label><input type="text" value={patientId} onChange={e=>setPatientId(e.target.value)} placeholder="12-3456-7890-1234" className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-4 text-white font-mono text-sm outline-none focus:ring-2 focus:ring-indigo-500/40 transition" /></div>
+                  <div className="space-y-2"><label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest px-1">Patient ID (ABHA)</label><input type="text" value={patientId} onChange={e=>setPatientId(e.target.value)} placeholder="12-3456-7890-1234" className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-4 text-white font-mono text-sm outline-none focus:ring-2 focus:ring-indigo-500/40 transition" /></div>
                   <div className="flex items-center gap-4"><div className="flex-1 h-px bg-white/5" /><span className="text-[9px] font-black text-zinc-800 uppercase">Or</span><div className="flex-1 h-px bg-white/5" /></div>
-                  <div className="space-y-2"><label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest px-1">Registered ID Email</label><input type="email" value={patientEmail} onChange={e=>setPatientEmail(e.target.value)} placeholder="identity@node.health" className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:ring-2 focus:ring-indigo-500/40 transition" /></div>
+                  <div className="space-y-2"><label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest px-1">Patient Email</label><input type="email" value={patientEmail} onChange={e=>setPatientEmail(e.target.value)} placeholder="patient@email.com" className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:ring-2 focus:ring-indigo-500/40 transition" /></div>
                </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                {[
-                 { label: 'Patient Density', value: '142' },
-                 { label: 'Vectors Signed', value: '318' },
-                 { label: 'Clinical Loops', value: '84' },
-                 { label: 'Infrastructure', value: 'Active' },
+                 { label: 'Patient Count', value: '142' },
+                 { label: 'Records Signed', value: '318' },
+                 { label: 'Consultations', value: '84' },
+                 { label: 'System Status', value: 'Secure' },
                ].map((m,i)=>(
                  <div key={i} className="p-5 rounded-2xl border border-white/5 bg-zinc-900/40 space-y-1">
                     <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">{m.label}</p>
                     <p className="text-xl font-black text-white">{m.value}</p>
                  </div>
                ))}
-            </div>
-
-            <div className="rounded-3xl border border-white/5 bg-zinc-900/50 p-6 space-y-4">
-               <div className="flex items-center justify-between"><h3 className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Institutional Signature</h3><p className="text-[9px] text-zinc-600 font-bold uppercase tracking-widest">{logoUrl ? 'Customized' : 'Verified mark'}</p></div>
-               {logoUrl ? <div className="p-3 bg-white rounded-xl border-4 border-indigo-500/20"><img src={logoUrl} className="max-h-12 object-contain mx-auto" /></div> : <label className="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-zinc-800 rounded-2xl cursor-pointer hover:border-indigo-500/30 transition bg-zinc-950/40 group"><FileText size={24} className="text-zinc-600 group-hover:text-indigo-400 mb-2 transition-colors" /><span className="text-[9px] font-black text-zinc-600 uppercase tracking-widest">Drop hospital mark</span><input type="file" className="hidden" onChange={handleLogoUpload} /></label>}
             </div>
           </div>
 
@@ -257,48 +316,77 @@ export default function EMRDashboard() {
                <div className="bg-white/5 p-8 border-b border-white/5 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                      <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20"><Stethoscope size={20} /></div>
-                     <div><h2 className="text-sm font-black text-white uppercase tracking-widest">Charting Protocol</h2><p className="text-[10px] text-zinc-600 font-mono uppercase tracking-[0.2em]">EMR_VERIFIED_PROTOCOL_v3.4</p></div>
+                     <div><h2 className="text-sm font-black text-white uppercase tracking-widest">Patient Record</h2><p className="text-[10px] text-zinc-600 font-mono uppercase tracking-[0.2em]">Verified Secure Session</p></div>
                   </div>
-                  <div className="flex items-center gap-4 text-right">
-                     <div className="space-y-0.5"><p className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Provider Node</p><input value={doctorName} onChange={e=>setDoctorName(e.target.value)} className="bg-transparent text-[11px] font-black text-zinc-300 text-right uppercase border-none focus:ring-0 w-36 outline-none" /></div>
+                  <div className="flex items-center gap-4 text-right hidden sm:flex">
+                     <div className="space-y-0.5"><p className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Doctor Name</p><input value={doctorName} onChange={e=>setDoctorName(e.target.value)} className="bg-transparent text-[11px] font-black text-zinc-300 text-right uppercase border-none focus:ring-0 w-36 outline-none" /></div>
                      <div className="w-px h-8 bg-white/5 mx-2" />
-                     <div className="space-y-0.5"><p className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Facility Origin</p><input value={hospitalName} onChange={e=>setHospitalName(e.target.value)} className="bg-transparent text-[11px] font-black text-zinc-300 text-right uppercase border-none focus:ring-0 w-36 outline-none" /></div>
+                     <div className="space-y-0.5">
+                        <p className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Hospital Name</p>
+                        <p className="text-[11px] font-black text-indigo-400 text-right uppercase py-1">{hospitalName}</p>
+                     </div>
                   </div>
                </div>
 
                <form onSubmit={handleSubmit} className="p-8 space-y-10">
                   <div className="grid md:grid-cols-2 gap-8">
                      <div className="space-y-2.5">
-                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Document Payload</label>
+                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Document Type</label>
                         <select value={docType} onChange={e=>setDocType(e.target.value)} className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-4 text-xs font-bold text-white outline-none cursor-pointer hover:bg-zinc-900 transition appearance-none">
                            <option>Prescription</option><option>Clinical Note</option><option>Imaging Ledger</option><option>Discharge Protocol</option>
                         </select>
                      </div>
                      <div className="space-y-2.5">
-                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Institutional Signature date</label>
+                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Signature Date</label>
                         <input disabled value={new Date().toLocaleDateString('en-IN', { day: '2-digit', month: 'long', year: 'numeric' })} className="w-full bg-zinc-900/30 border border-zinc-800/50 rounded-2xl px-5 py-4 text-xs font-mono text-zinc-600 cursor-not-allowed" />
                      </div>
                   </div>
 
                   <div className="space-y-8">
                      <div className="space-y-3">
-                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Primary Clinical indications <span className="font-mono text-zinc-700 font-bold ml-1">(CSV Protocol)</span></label>
+                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1 flex items-center justify-between">
+                           <span>Patient Symptoms <span className="font-mono text-zinc-700 font-bold ml-1">(Separate with commas)</span></span>
+                           {symptoms.toLowerCase().includes('fever') && <span className="text-[8px] tracking-widest text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse"><AlertCircle size={10}/> Outbreak Risk Detected</span>}
+                        </label>
                         <input value={symptoms} onChange={e=>setSymptoms(e.target.value)} placeholder="Fever, Dry Cough, Acute fatigue..." className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-6 py-5 text-sm font-bold text-white placeholder-zinc-800 outline-none focus:ring-2 focus:ring-indigo-500/30 transition shadow-inner" />
                      </div>
                      <div className="space-y-3">
-                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Verified Clinical Diagnosis <span className="font-mono text-zinc-800 font-bold ml-1">(REQUIRED)</span></label>
-                        <input value={diagnosis} onChange={e=>setDiagnosis(e.target.value)} placeholder="Institutional Diagnostic Summary..." className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-6 py-5 text-lg font-black text-white tracking-tight placeholder-zinc-800 outline-none focus:ring-2 focus:ring-indigo-500/30 transition shadow-inner" />
+                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Clinical Diagnosis <span className="font-mono text-zinc-800 font-bold ml-1">(REQUIRED)</span></label>
+                        <input value={diagnosis} onChange={e=>setDiagnosis(e.target.value)} placeholder="Enter diagnosis details..." className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-6 py-5 text-lg font-black text-white tracking-tight placeholder-zinc-800 outline-none focus:ring-2 focus:ring-indigo-500/30 transition shadow-inner" />
                      </div>
                      <div className="grid md:grid-cols-2 gap-8">
-                        <div className="space-y-3"><label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Pharmaceutical Regimen</label><textarea value={medicines} onChange={e=>setMedicines(e.target.value)} placeholder="Drug Name / Salt (CSV)..." rows={4} className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-4 text-xs font-bold text-zinc-300 placeholder-zinc-800 outline-none resize-none focus:border-indigo-500/30 transition shadow-inner" /></div>
+                        <div className="space-y-3">
+                           <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1 flex items-center justify-between">
+                              <span>Prescribed Medicines</span>
+                              {medicines.length > 2 && <span className="text-[8px] tracking-widest text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full flex items-center gap-1"><Shield size={10}/> Network Sync Active</span>}
+                           </label>
+                           <textarea value={medicines} onChange={e=>setMedicines(e.target.value)} placeholder="Drug Name / Salt (Separate with commas)..." rows={4} className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-4 text-xs font-bold text-zinc-300 placeholder-zinc-800 outline-none resize-none focus:border-indigo-500/30 transition shadow-inner" />
+                        </div>
                         <div className="space-y-3"><label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Dosage Frequency Instructions</label><textarea value={dosage} onChange={e=>setDosage(e.target.value)} placeholder="Dosage (CSV matched to medicines)..." rows={4} className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-4 text-xs font-bold text-zinc-300 placeholder-zinc-800 outline-none resize-none focus:border-indigo-500/30 transition shadow-inner" /></div>
                      </div>
                   </div>
 
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-white/5">
+                     <div className="space-y-4">
+                        <div className="flex items-center gap-3">
+                           <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400"><Database size={16} /></div>
+                           <h3 className="text-[10px] font-black uppercase tracking-widest text-white">Billing Information</h3>
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[10px] font-black text-zinc-500 uppercase tracking-widest px-1">Consultation Fee (₹)</label>
+                          <input type="number" value={billingAmount} onChange={e=>setBillingAmount(e.target.value)} placeholder="500" className="w-full bg-zinc-900 border border-white/5 rounded-2xl px-5 py-4 text-white font-mono text-xl outline-none focus:ring-2 focus:ring-emerald-500/40 transition placeholder-zinc-800" />
+                        </div>
+                     </div>
+                     <div className="p-6 rounded-2xl bg-zinc-900/40 border border-white/5 flex flex-col justify-center">
+                        <p className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-1">Total Institutional Claim</p>
+                        <p className="text-3xl font-black text-white leading-none">₹{billingAmount || '0'} <span className="text-[10px] text-zinc-600 uppercase">Gst Incl.</span></p>
+                     </div>
+                  </div>
+
                   <div className="pt-6 flex flex-col sm:flex-row items-center justify-end gap-4 border-t border-white/5">
-                     <button type="button" onClick={()=>setShowPreview(true)} className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-zinc-800/80 border border-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white hover:bg-zinc-700 transition shadow-xl">📄 Intelligence Preview</button>
+                     <button type="button" onClick={()=>setShowPreview(true)} className="w-full sm:w-auto px-10 py-5 rounded-2xl bg-zinc-800/80 border border-white/5 text-[10px] font-black uppercase tracking-widest text-zinc-400 hover:text-white hover:bg-zinc-700 transition shadow-xl">📄 Preview Record</button>
                      <button type="submit" disabled={loading} className="w-full sm:w-auto px-12 py-5 rounded-2xl bg-indigo-500 text-white text-[10px] font-black uppercase tracking-widest hover:bg-indigo-600 transition shadow-xl shadow-indigo-500/20 active:scale-95 disabled:opacity-50 flex items-center justify-center gap-3">
-                        {loading ? 'Propagating...' : <>Commit Identity Vector <ArrowRight size={18} /></>}
+                        {loading ? 'Saving...' : <>Save Patient Record <ArrowRight size={18} /></>}
                      </button>
                   </div>
                </form>
@@ -306,27 +394,22 @@ export default function EMRDashboard() {
           </div>
         </div>
 
-        {/* PHASE 2 */}
-         <div className="rounded-3xl border border-white/5 bg-zinc-900/30 p-8 space-y-6">
-            <h3 className="text-[10px] font-black text-zinc-600 uppercase tracking-[0.3em] flex flex-col sm:flex-row items-center justify-between gap-4">Infrastructure Roadmap <span className="bg-indigo-500/10 text-indigo-400 px-3 py-1 rounded-full border border-indigo-500/20">Phase 2.0</span></h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-               {['Billing Protocol Alpha', 'Pharmacy direct-loop', 'Scheduled Surveillance', 'Revenue Analytics v2'].map((item,i)=>(
-                 <div key={i} className="p-5 rounded-2xl bg-zinc-950/50 border border-white/5 flex items-center justify-between group hover:border-indigo-500/30 transition">
-                    <p className="text-[11px] font-bold text-zinc-500 group-hover:text-zinc-300 transition-colors">{item}</p>
-                    <ChevronRight size={14} className="text-zinc-800 group-hover:text-indigo-400 transition-colors" />
-                 </div>
-               ))}
-            </div>
-         </div>
-
-        {/* FOOTER */}
         <footer className="pt-10 border-t border-white/5 text-center sm:text-left flex flex-col sm:flex-row items-center justify-between gap-6">
-           <p className="text-[9px] font-black text-zinc-800 uppercase tracking-[0.2em] max-w-xl">
-              Institutional clinical Management environment complying with ABDM R4 & DISHA security frameworks · encrypted node distribution enabled.
-           </p>
+           <div className="max-w-xl text-center sm:text-left space-y-1">
+              <p className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em]">System Philosophy</p>
+              <p className="text-[9px] font-black text-zinc-500 uppercase tracking-[0.2em] leading-relaxed">
+                 "We separate the actor (Hospital) from the data (EMR) to enable interoperability, portability, and intelligent analysis."
+              </p>
+           </div>
            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2"><Shield size={12} className="text-indigo-500" /><p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">E2E Sovereign Security</p></div>
-              <div className="flex items-center gap-2"><Database size={12} className="text-indigo-500" /><p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Live Node Verified</p></div>
+              <button 
+                 onClick={() => setDrawerOpen(true)}
+                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-500/5 hover:bg-indigo-500/10 border border-indigo-500/20 transition cursor-pointer"
+              >
+                 <Activity size={12} className="text-indigo-500 animate-pulse" />
+                 <p className="text-[10px] font-black text-indigo-400 uppercase tracking-widest">Live Operations Access</p>
+              </button>
+              <div className="flex items-center gap-2 hidden md:flex"><Shield size={12} className="text-zinc-600" /><p className="text-[10px] font-black text-zinc-600 uppercase tracking-widest">E2E Sovereign Security</p></div>
            </div>
         </footer>
       </div>

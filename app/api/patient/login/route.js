@@ -32,9 +32,9 @@ export async function POST(req) {
     distance = Math.sqrt(distance);
     console.log(`[FaceID] Patient: ${patient_id} | Distance: ${distance}`);
 
-    // Euclidean distance threshold — 0.72 accommodates real-world webcam variability (lighting, angle)
-    // while still reliably rejecting different individuals (typically > 0.90)
-    if (distance > 0.72) {
+    // Euclidean distance threshold — 0.85 accommodates real-world webcam variability (lighting, angle)
+    // and changes in appearance (hair, position) while still rejecting different individuals
+    if (distance > 0.85) {
       return NextResponse.json({ error: `Face mismatch. Distance: ${distance.toFixed(3)}` }, { status: 401 });
     }
 

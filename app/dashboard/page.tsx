@@ -24,19 +24,20 @@ export default function Home() {
         <div className="text-center mb-16 space-y-6 flex flex-col items-center">
            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 text-zinc-600 dark:text-zinc-300 text-xs font-bold uppercase tracking-widest mb-2 shadow-sm dark:shadow-inner">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              AyushAlert Network Live
+              AyushAlert Node Network Live
            </div>
            
            <h1 className="text-6xl md:text-[5.5rem] font-black tracking-tighter text-zinc-900 dark:text-white leading-[1.05]">
-              Platform Entry <br />
+              Institutional <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-400 to-indigo-500 pb-2 drop-shadow-sm">
-                 Terminal
+                 Access Ecosystem
               </span>
            </h1>
            
            <div className="flex flex-col gap-3">
-              <h2 className="text-xl md:text-2xl font-semibold text-zinc-600 dark:text-zinc-300 max-w-2xl mx-auto leading-tight">
-                 Select your operational role.
+              <h2 className="text-xl md:text-2xl font-semibold text-zinc-600 dark:text-zinc-300 max-w-3xl mx-auto leading-tight">
+                 Authorized Gateway for Healthcare Interoperability. <br />
+                 <span className="text-sm font-medium opacity-60">Please select your primary operational node to begin securely.</span>
               </h2>
            </div>
         </div>
@@ -53,14 +54,14 @@ export default function Home() {
               </div>
               <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2 tracking-tight">Patient</h2>
               <p className="text-zinc-600 dark:text-zinc-500 text-xs mb-8 flex-grow leading-relaxed">
-                 Register identity, upload legacy records via AI, and command tokenized access for your network.
+                 Create your account, upload medical records, and control who can view your health data securely.
               </p>
               <div className="flex flex-col gap-2 w-full mt-auto">
                  <Link href="/patient/register" className="w-full py-2.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-black font-medium text-xs text-center rounded-lg transition-colors">
-                    Register Identity
+                    Create Account
                  </Link>
                  <Link href="/patient/login" className="w-full py-2.5 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 border border-zinc-200 dark:border-zinc-800 text-zinc-900 dark:text-zinc-300 font-medium text-xs text-center rounded-lg transition-colors">
-                    Secure Login
+                    Patient Login
                  </Link>
               </div>
            </div>
@@ -74,7 +75,7 @@ export default function Home() {
               </div>
               <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2 tracking-tight">Doctor</h2>
               <p className="text-zinc-600 dark:text-zinc-500 text-xs mb-8 flex-grow leading-relaxed">
-                 Perform live biometric scans of visiting patients to request real-time, 15-minute temporary decryption tokens.
+                 Securely access patient records with clinical consent to provide consultations and treatment.
               </p>
               <div className="flex flex-col w-full mt-auto">
                  <Link href="/doctor/login" className="w-full py-2.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-black font-medium text-xs text-center rounded-lg transition-colors">
@@ -92,7 +93,7 @@ export default function Home() {
               </div>
               <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2 tracking-tight">Hospital</h2>
               <p className="text-zinc-600 dark:text-zinc-500 text-xs mb-8 flex-grow leading-relaxed">
-                 Authoritative EHR ingestion. Push verified lab results, JSON FHIR bundles, and diagnosis trees directly to timelines.
+                 Hospital record management. Upload verified lab results, reports, and diagnoses directly to patient timelines.
               </p>
               <div className="flex flex-col w-full mt-auto">
                  <Link href="/hospital/portal" className="w-full py-2.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-black font-medium text-xs text-center rounded-lg transition-colors">
@@ -110,11 +111,11 @@ export default function Home() {
               </div>
               <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2 tracking-tight">Analytics</h2>
               <p className="text-zinc-600 dark:text-zinc-500 text-xs mb-8 flex-grow leading-relaxed">
-                 Real-time epidemic and outbreak detection dashboard using universally anonymized, PII-stripped patient geometries.
+                 View real-time health trends and alerts in your community while maintaining total patient privacy.
               </p>
               <div className="flex flex-col w-full mt-auto">
                  <Link href="/analytics" className="w-full py-2.5 bg-zinc-900 dark:bg-zinc-100 hover:bg-black dark:hover:bg-white text-white dark:text-black font-medium text-xs text-center rounded-lg transition-colors">
-                    Live Surveillance
+                    Health Trends
                  </Link>
               </div>
            </div>
@@ -128,11 +129,11 @@ export default function Home() {
               </div>
               <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100 mb-2 tracking-tight flex items-center gap-2">EMR <span className="text-[10px] bg-rose-500/10 text-rose-500 px-1.5 py-0.5 rounded uppercase tracking-tighter">Secure</span></h2>
               <p className="text-zinc-600 dark:text-zinc-500 text-xs mb-8 flex-grow leading-relaxed">
-                 Clinical Charting Interface. Doctors map prescriptions and diagnoses directly to the sovereign health ledger.
+                 Clinical Charting Tool. Write prescriptions and record diagnoses securely for your patients.
               </p>
               <div className="flex flex-col w-full mt-auto">
                  <Link href="/emr" className="w-full py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-medium text-xs text-center rounded-lg transition-colors">
-                    Provider Terminal
+                    New Prescription
                  </Link>
               </div>
            </div>

@@ -53,13 +53,18 @@ const RecordSchema = new mongoose.Schema({
     enum: ['ocr', 'hospital'],
     default: 'ocr'
   },
-  last_verified_at: {
-    type: Date
+  billing_amount: {
+    type: Number,
+    default: 0
   },
-  uploaded_at: {
-    type: Date,
-    default: Date.now
-  }
+  payment_status: {
+    type: String,
+    enum: ['pending', 'paid', 'failed'],
+    default: 'paid'
+  },
+  hospital_id: { type: String, index: true },
+  last_verified_at: { type: Date },
+  uploaded_at: { type: Date, default: Date.now }
 });
 
 export default mongoose.models.Record || mongoose.model('Record', RecordSchema);

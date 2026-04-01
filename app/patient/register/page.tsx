@@ -133,7 +133,7 @@ export default function Register() {
 
       if (!res.ok) throw new Error(data.error || 'Registration failed');
 
-      setSuccess(`Registration successful! Your Patient ID is: ${data.patient_id}. Please save this ID. You can now login using your face.`);
+      setSuccess(`Registration successful! Your ABHA ID (Health ID) is: ${data.abha_id}. Your Patient ID is: ${data.patient_id}. Please save these details. You can now login using your face.`);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -142,7 +142,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-zinc-950 flex flex-col relative">
       {/* ── BACKGROUND MESH LAYER ────────────────────────────────────────── */}
       <div className="absolute inset-0 opacity-[0.4] pointer-events-none select-none z-0">
         <div className="absolute top-1/4 -right-1/4 w-[800px] h-[800px] bg-indigo-500/10 rounded-full blur-[160px]" />
@@ -210,7 +210,7 @@ export default function Register() {
             <motion.div 
                initial={{ opacity: 0, y: 20 }}
                animate={{ opacity: 1, y: 0 }}
-               className="glass-panel p-8 md:p-10 border-t-4 border-t-indigo-500 shadow-2xl relative overflow-hidden"
+               className="glass-panel p-8 md:p-10 border-t-4 border-t-indigo-500 shadow-2xl relative"
             >
               {/* Alert Area */}
               {(error || success) && (

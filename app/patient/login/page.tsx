@@ -47,6 +47,10 @@ export default function Login() {
 
   const startCamera = async () => {
     if (!modelsLoaded) return;
+    if (!patientId.trim()) {
+      setError("Please enter your Patient ID first before scanning.");
+      return;
+    }
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       if (videoRef.current) {
@@ -136,7 +140,7 @@ export default function Login() {
       localStorage.setItem('token', data.token);
       localStorage.setItem('patient_id', data.patient_id);
       
-      setSuccess('Biometric Access Verified. Entering portal...');
+      setSuccess('Identity verified. Entering portal...');
       
       setTimeout(() => {
          router.push('/patient/dashboard');
@@ -226,7 +230,7 @@ export default function Login() {
             className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-[10px] font-black uppercase tracking-[0.2em] text-cyan-400"
           >
             <Shield size={12} strokeWidth={3} />
-            Sovereign Access Protocol
+            Secure Login
           </motion.div>
           
           <motion.h1 
@@ -235,8 +239,8 @@ export default function Login() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            Authenticate <br /> 
-            <span className="text-zinc-600">Your Identity.</span>
+            Access Your <br /> 
+            <span className="text-zinc-600">Health Records.</span>
           </motion.h1>
 
           <motion.p 
@@ -245,7 +249,7 @@ export default function Login() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4 }}
           >
-            Access your unified health records via biometric orchestration or secure cryptographic tokens. Your data, your sovereignty.
+            Access your medical history and health records securely using face recognition or a simple login code.
           </motion.p>
         </div>
 
@@ -279,20 +283,20 @@ export default function Login() {
           <div className="lg:hidden flex justify-center mb-8">
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <BrandLogo variant="horizontal" size={32} />
-              <span className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black uppercase tracking-widest text-indigo-400">Institutional Hub</span>
+              <span className="px-3 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-[10px] font-black uppercase tracking-widest text-indigo-400">Patient Portal</span>
             </div>
           </div>
 
           {/* Header */}
           <div className="space-y-3">
              <div className="flex items-center justify-between">
-                <h2 className="text-2xl font-bold tracking-tight text-white">Sovereign Point</h2>
+                <h2 className="text-2xl font-bold tracking-tight text-white">Patient Login</h2>
                 <Link href="/" className="text-[10px] font-black uppercase tracking-widest text-zinc-500 hover:text-white transition flex items-center gap-2 group">
                    <ArrowLeft size={12} className="group-hover:-translate-x-1 transition-transform" />
                    Back
                 </Link>
              </div>
-             <p className="text-zinc-500 text-sm font-medium">Verify your decentralized identifier to enter.</p>
+             <p className="text-zinc-500 text-sm font-medium">Please enter your ID to continue.</p>
           </div>
 
           <AnimatePresence mode="wait">
@@ -322,7 +326,7 @@ export default function Login() {
                 <div className="relative group">
                   <div className="absolute inset-0 bg-cyan-500/5 blur-xl group-focus-within:bg-cyan-500/10 transition-colors" />
                   <div className="relative">
-                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 block mb-2 px-1">Patient Identity Identifier (PII)</label>
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] text-zinc-500 block mb-2 px-1">Your Patient ID</label>
                     <input 
                       required 
                       placeholder="PAT_••••••••"
@@ -339,10 +343,10 @@ export default function Login() {
                 {!otpSent && (
                   <div className="flex bg-zinc-900/80 p-1.5 rounded-2xl border border-zinc-800/80 shadow-inner">
                     <button onClick={() => setLoginMethod('face')} className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${loginMethod === 'face' ? 'bg-zinc-800 text-cyan-400 shadow-xl border border-white/5' : 'text-zinc-500 hover:text-zinc-300'}`}>
-                      <Fingerprint size={14} /> Biometrics
+                      <Fingerprint size={14} /> Face Scan
                     </button>
                     <button onClick={() => { setLoginMethod('otp'); stopCamera(); }} className={`flex-1 py-3 text-[10px] font-black uppercase tracking-widest rounded-xl transition-all flex items-center justify-center gap-2 ${loginMethod === 'otp' ? 'bg-zinc-800 text-cyan-400 shadow-xl border border-white/5' : 'text-zinc-500 hover:text-zinc-300'}`}>
-                      <Mail size={14} /> Auth Token
+                      <Mail size={14} /> Login Code
                     </button>
                   </div>
                 )}
@@ -355,15 +359,14 @@ export default function Login() {
                     {!modelsLoaded && (
                       <div className="flex flex-col items-center gap-3">
                         <Activity className="text-cyan-500/40 animate-pulse" size={32} />
-                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Local Neural Engine Calibrating...</p>
+                        <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600">Loading...</p>
                       </div>
                     )}
                     
                     {modelsLoaded && !cameraActive && (
                       <button 
                         onClick={startCamera} 
-                        disabled={!patientId.trim()}
-                        className="relative z-30 group/btn h-14 w-14 rounded-full bg-cyan-500 text-zinc-950 flex items-center justify-center transition-all hover:scale-110 active:scale-95 disabled:grayscale disabled:opacity-30 disabled:scale-100 shadow-[0_0_30px_rgba(34,211,238,0.4)]"
+                        className="relative z-30 group/btn h-14 w-14 rounded-full bg-cyan-500 text-zinc-950 flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-[0_0_30px_rgba(34,211,238,0.4)]"
                       >
                         <Fingerprint size={28} className="group-hover/btn:animate-pulse" />
                       </button>
@@ -374,14 +377,14 @@ export default function Login() {
                       autoPlay 
                       muted 
                       playsInline
-                      className={`w-full h-full object-cover transition-opacity duration-700 ${!cameraActive ? 'opacity-0' : 'opacity-100'}`}
+                      className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${!cameraActive ? 'opacity-0' : 'opacity-100'}`}
                     />
 
                     {cameraActive && (
                       <ScannerOverlay 
                         status={loading ? 'verifying' : countdown !== null ? 'verifying' : 'scanning'}
                         countdown={countdown}
-                        label={loading ? "Verifying Signature" : countdown !== null ? "Geometry Fixed" : "Live Scan: Active"} 
+                        label={loading ? "Checking details..." : countdown !== null ? "Face Detected" : "Align your face"} 
                       />
                     )}
                   </div>
@@ -393,13 +396,13 @@ export default function Login() {
                   >
                     {!otpSent ? (
                       <div className="space-y-6">
-                        <p className="text-xs text-zinc-500 font-medium leading-relaxed uppercase tracking-wide">A unique 6-digit cryptographic token will be dispatched to your decentralized repository contact.</p>
+                        <p className="text-xs text-zinc-500 font-medium leading-relaxed uppercase tracking-wide">We'll send a 6-digit verification code to your mobile or email.</p>
                         <button 
                           onClick={requestOtp} 
                           disabled={loading || !patientId.trim()} 
                           className="w-full bg-white text-zinc-950 h-14 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-zinc-200 transition-all disabled:opacity-50 shadow-[0_0_30px_rgba(255,255,255,0.1)] active:scale-[0.98]"
                         >
-                          {loading ? 'Transmitting...' : 'Dispatch Protocol Token'}
+                          {loading ? 'Sending code...' : 'Get Code'}
                         </button>
                       </div>
                     ) : (
@@ -417,7 +420,7 @@ export default function Login() {
                           disabled={loading || otp.length < 6} 
                           className="w-full bg-cyan-500 text-zinc-950 h-14 rounded-2xl font-black text-xs uppercase tracking-widest hover:opacity-90 transition-all disabled:opacity-50 shadow-[0_0_30px_rgba(34,211,238,0.3)] active:scale-[0.98]"
                         >
-                          {loading ? 'Verifying Integrity...' : 'Establish Handshake'}
+                          {loading ? 'Verifying...' : 'Login'}
                         </button>
                         
                         <div className="flex justify-between items-center w-full px-2">
@@ -435,10 +438,10 @@ export default function Login() {
           {/* Footer Branding */}
           <div className="pt-20 text-center">
             <p className="text-[10px] font-black uppercase tracking-widest text-zinc-600 mb-4 px-8 leading-loose">
-              By authenticating, you acknowledge the sovereignty of your health data under the AyushAlert Unified Infrastructure Protocol.
+              By logging in, you agree to our terms of service and secure data policy.
             </p>
             <p className="text-xs font-bold text-zinc-500">
-              New to the protocol? <Link href="/patient/register" className="text-cyan-400 hover:text-cyan-300 transition-colors ml-1 uppercase tracking-widest">Register Identity</Link>
+              New to AyushAlert? <Link href="/patient/register" className="text-cyan-400 hover:text-cyan-300 transition-colors ml-1 uppercase tracking-widest">Sign Up Now</Link>
             </p>
           </div>
         </div>

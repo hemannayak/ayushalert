@@ -27,7 +27,7 @@ export async function POST(req) {
 
     // ── Step 3: Parse body ───────────────────────────────────────────────
     const body = await req.json();
-    const { abha_id, patient_email, records } = body;
+    const { abha_id, patient_email, records, billing_amount } = body;
 
     if (!records || !Array.isArray(records) || records.length === 0) {
       return NextResponse.json({ error: 'records array is required' }, { status: 400 });
@@ -73,6 +73,8 @@ export async function POST(req) {
         // Traceability — who pushed this record
         hospital_id:      hospital.hospital_id,
         hospital_name:    hospital.name,
+        billing_amount:   billing_amount || 0,
+        payment_status:   'paid',
       });
 
       await newRecord.save();

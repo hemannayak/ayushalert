@@ -19,7 +19,7 @@ const HospitalSchema = new mongoose.Schema({
   verified_by:     { type: String, default: null }, // admin user or system
 
   // API Key (generated only after verification)
-  api_key:         { type: String, default: null, unique: true, sparse: true },
+  api_key:         { type: String, unique: true, sparse: true },
 
   created_at:      { type: Date, default: Date.now },
 });

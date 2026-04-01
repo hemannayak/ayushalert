@@ -13,9 +13,7 @@ export default function PatientLayout({
 
       <PatientNav />
       <main className="flex-1 flex flex-col min-h-screen h-screen overflow-y-auto z-10">
-        <div className="p-4 sm:p-6 lg:p-10 max-w-6xl mx-auto w-full">
           {children}
-        </div>
       </main>
     </div>
   );

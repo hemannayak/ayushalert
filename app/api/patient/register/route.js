@@ -69,7 +69,7 @@ export async function POST(req) {
           from: process.env.SMTP_EMAIL,
           to: email,
           subject: 'Welcome to the AyushAlert Portal!',
-          text: `Hello ${name},\n\nYour digital health account has been successfully created!\n\nYour unique Patient ID is: ${patient_id}\nYour backup password is: ${password}\n\nYou can now log in securely using your Patient ID and Face ID.\n\nThank you!`
+          text: `Hello ${name},\n\nYour digital health account has been successfully created!\n\nYour unique Patient ID is: ${patient_id}\nYour Digital Health ABHA ID is: ${final_abha_id}\nYour backup password is: ${password}\n\nYou can now log in securely using your Patient ID and Face ID.\n\nThank you!`
         };
 
         await transporter.sendMail(mailOptions);

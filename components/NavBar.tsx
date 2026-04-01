@@ -100,8 +100,8 @@ export function NavBar() {
             </button>
           )}
           <Link href="/dashboard" className="bg-zinc-950 dark:bg-brand text-white px-4 sm:px-6 py-2 rounded-xl text-sm font-black uppercase tracking-widest sm:tracking-normal sm:capitalize hover:opacity-90 transition-all shadow-sm">
-            <span className="hidden sm:inline">Launch Platform</span>
-            <span className="sm:hidden text-[10px]">Launch</span>
+            <span className="hidden sm:inline">Access Ecosystem</span>
+            <span className="sm:hidden text-[10px]">Access</span>
           </Link>
         </div>
       </div>

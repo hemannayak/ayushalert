@@ -74,26 +74,21 @@ export default function LandingPage() {
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-brand"></span>
                 </span>
-                Infrastructure v2.4.0 <span className="mx-1 opacity-20">|</span> Unified Protocol
+                Healthcare System <span className="mx-1 opacity-20">|</span> Secure Platform
               </span>
               <h1 className="text-6xl md:text-8xl font-bold tracking-tighter leading-[0.85] text-zinc-900 dark:text-zinc-50">
-                Healthcare Data <br /> Infrastructure. <span className="text-brand underline decoration-zinc-800/20 underline-offset-[12px]">Orchestrated.</span>
+                Healthcare Data <br /> Platform. <span className="text-brand underline decoration-zinc-800/20 underline-offset-[12px]">Simplified.</span>
               </h1>
             </motion.div>
             
-            <motion.p 
-              className="text-lg md:text-xl text-zinc-500 dark:text-zinc-400 font-medium leading-relaxed max-w-xl"
-              variants={fadeIn}
-            >
-              The autonomous engine for decentralized health records. Digitizing at the edge, syncing with FHIR natively.
-            </motion.p>
+              The secure platform for your health records. Easy digital records, synced securely with hospitals.
             
             <motion.div 
               className="flex flex-col sm:flex-row items-center gap-5 pt-4"
               variants={fadeIn}
             >
               <Link href="/dashboard" className="group w-full sm:w-auto h-14 inline-flex items-center justify-center gap-2 px-10 bg-zinc-950 dark:bg-brand text-white hover:opacity-90 rounded-xl text-base font-semibold transition-all shadow-2xl shadow-brand/10">
-                Deploy Now <ArrowRight size={20} strokeWidth={2} className="group-hover:translate-x-1 transition-transform" />
+                Get Started <ArrowRight size={20} strokeWidth={2} className="group-hover:translate-x-1 transition-transform" />
               </Link>
               <Link href="#modules" className="w-full sm:w-auto h-14 inline-flex items-center justify-center gap-2 px-10 bg-white dark:bg-zinc-900/50 text-zinc-600 dark:text-zinc-300 border border-zinc-200 dark:border-zinc-800 hover:bg-zinc-100 dark:hover:bg-zinc-800/80 rounded-xl text-base font-semibold transition-all">
                 View All Modules
@@ -122,12 +117,12 @@ export default function LandingPage() {
                         <div className="w-2.5 h-2.5 rounded-full bg-emerald-500/80 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
                       </div>
                       <div className="px-3 py-1 rounded bg-zinc-800 border border-zinc-700 text-[10px] font-black text-zinc-400 tracking-tighter uppercase">
-                        Region: <span className="text-zinc-50 font-mono">HYD-042</span>
+                        Location: <span className="text-zinc-50 font-mono">Hyderabad</span>
                       </div>
                    </div>
                    <div className="flex items-center gap-3">
                       <div className="h-2 w-2 rounded-full bg-brand animate-pulse" />
-                      <span className="text-[10px] font-bold text-brand uppercase tracking-widest">Protocol Active</span>
+                      <span className="text-[10px] font-bold text-brand uppercase tracking-widest">System Online</span>
                    </div>
                 </div>
                 
@@ -138,16 +133,16 @@ export default function LandingPage() {
                    >
                       <div className="flex items-center justify-between relative z-10">
                          <div className="flex gap-2 items-center">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-brand">Surveillance Alert</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-brand">Health Alert</span>
                             <span className="w-1 h-1 rounded-full bg-brand/40" />
-                            <span className="text-[10px] font-medium text-brand/60">Node-Sync</span>
+                            <span className="text-[10px] font-medium text-brand/60">Syncing...</span>
                          </div>
                          <span className="text-[10px] font-mono text-brand/40">ID: AX-772</span>
                       </div>
                       <div className="flex items-center gap-6 relative z-10">
                          <RadarPulse />
                          <div className="space-y-1">
-                            <h4 className="text-lg font-bold text-zinc-100 tracking-tighter leading-tight">Regional Cluster Found</h4>
+                            <h4 className="text-lg font-bold text-zinc-100 tracking-tighter leading-tight">Local Health Trend</h4>
                             <p className="text-xs font-mono text-zinc-500">Pincode: <span className="text-zinc-300">500032 (Gachibowli)</span></p>
                          </div>
                       </div>
@@ -178,8 +173,8 @@ export default function LandingPage() {
 
                    <div className="space-y-4 pt-4 border-t border-zinc-800/50">
                       <div className="flex items-center justify-between">
-                         <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Protocol Ledger</span>
-                         <span className="text-[10px] font-mono text-zinc-600">RT-SYNC: LIVE</span>
+                         <span className="text-[10px] font-black text-zinc-500 uppercase tracking-widest">Recent Activity</span>
+                         <span className="text-[10px] font-mono text-zinc-600">SYSTEM: ONLINE</span>
                       </div>
                       <AutoScrollFeed />
                    </div>
@@ -196,7 +191,7 @@ export default function LandingPage() {
             <div className="max-w-3xl">
               <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-100 leading-[1.1]">
                 Simple Deployment. <br/>
-                <span className="text-zinc-400">Complex Infrastructure Solved.</span>
+                <span className="text-zinc-400">Comprehensive Healthcare. Simplified for You.</span>
               </h2>
             </div>
 
@@ -208,20 +203,20 @@ export default function LandingPage() {
               transition={{ duration: 0.8 }}
             >
               <ArchitectureItem 
-                icon={Plus} step="01" title="Unified Ingestion"
-                desc="AI-powered digitisation. Instant FHIR conversion."
+                icon={Plus} step="01" title="Easy Records"
+                desc="Fast digital records. Accurate and secure."
               />
               <ArchitectureItem 
-                icon={Layers} step="02" title="Central Intelligence"
-                desc="Unified engine for real-time patient timelines."
+                icon={Layers} step="02" title="Patient History"
+                desc="One place for all your previous medical records."
               />
               <ArchitectureItem 
-                icon={Shield} step="03" title="Handshake Protocol"
-                desc="Patient-owned keys. Cryptographic consent."
+                icon={Shield} step="03" title="Secure Consent"
+                desc="You own your data. You choose who sees it."
               />
               <ArchitectureItem 
-                icon={Zap} step="04" title="Regional Awareness"
-                desc="Autonomous mapping for localized anomalies."
+                icon={Zap} step="04" title="Health Trends"
+                desc="See health patterns and alerts in your area."
               />
             </motion.div>
           </div>
@@ -231,31 +226,31 @@ export default function LandingPage() {
         <section id="modules" className="py-32 px-6 md:px-12 border-t border-zinc-100 dark:border-zinc-800/60 bg-white dark:bg-[#0B0F14]">
            <div className="max-w-7xl mx-auto space-y-20">
               <div className="max-w-2xl space-y-4">
-                 <h2 className="text-[10px] font-black text-brand uppercase tracking-[0.3em]">Institutional Ecosystem</h2>
-                 <h3 className="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tighter leading-none">Unified Platform. Multiple Actors.</h3>
-                 <p className="text-lg text-zinc-500 font-medium leading-relaxed">System-level orchestration for patients, clinicians, and regional health nodes.</p>
+                 <h2 className="text-[10px] font-black text-brand uppercase tracking-[0.3em]">Our Network</h2>
+                 <h3 className="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tighter leading-none">One Platform. For Everyone.</h3>
+                 <p className="text-lg text-zinc-500 font-medium leading-relaxed">A simple way for patients, doctors, and hospitals to work together.</p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <ModuleCard 
-                  icon={Database} title="Institutional Repository" 
-                  desc="Digitize and integrate clinical data into a unified, FHIR-compliant ecosystem." 
-                  tags={["Enterprise", "Infrastructure Layer"]} image="/Assets/emr_terminal.png"
+                  icon={Database} title="Hospital Records" 
+                  desc="A secure way for hospitals to store and manage patient data." 
+                  tags={["Hospitals", "Data Storage"]} image="/Assets/emr_terminal.png"
                 />
                 <ModuleCard 
-                  icon={Stethoscope} title="Clinical Command Suite" 
-                  desc="Intelligent data ingestion pipelines for diagnostics and patient history." 
-                  tags={["Diagnostics", "Orchestration"]} image="/Assets/doctor_terminal.png"
+                  icon={Stethoscope} title="Doctor Portal" 
+                  desc="A simple tool for doctors to view history and write prescriptions." 
+                  tags={["Doctors", "Prescriptions"]} image="/Assets/doctor_terminal.png"
                 />
                 <ModuleCard 
-                  icon={LayoutGrid} title="Sovereign Health Identity" 
-                  desc="A consent-driven PHR wallet enabling secure, cross-node data exchange." 
-                  tags={["Governance", "Citizen-First"]} image="/Assets/patient_wallet.png"
+                  icon={LayoutGrid} title="Patient Account" 
+                  desc="Your health in your hands. Securely share your records when needed." 
+                  tags={["Patients", "Private"]} image="/Assets/patient_wallet.png"
                 />
                 <ModuleCard 
-                  icon={Activity} title="Public Health Intelligence" 
-                  desc="A real-time surveillance system for population-level health markers." 
-                  tags={["Intelligence", "Regional Analytics"]} image="/Assets/surveillance.png"
+                  icon={Activity} title="Health Analytics" 
+                  desc="See real-time health trends and alerts in your community." 
+                  tags={["Public Health", "Trends"]} image="/Assets/surveillance.png"
                 />
               </div>
            </div>
@@ -265,8 +260,8 @@ export default function LandingPage() {
         <section id="ecosystem" className="py-32 px-6 md:px-12 bg-zinc-950 text-white overflow-hidden relative border-t border-zinc-800/60">
            <div className="absolute top-0 right-0 w-[600px] h-[600px] bg-brand/20 blur-[150px] rounded-full -translate-y-1/2 translate-x-1/2" />
            <div className="max-w-5xl mx-auto text-center space-y-10 relative z-10">
-              <h2 className="text-5xl md:text-[80px] font-bold tracking-tighter leading-[0.9]">Transform your institution <br /> into a modern health node.</h2>
-              <p className="text-xl text-zinc-400 max-w-2xl mx-auto font-medium">Ready to deploy the AyushAlert autonomous package to your network?</p>
+              <h2 className="text-5xl md:text-[80px] font-bold tracking-tighter leading-[0.9]">Connect your hospital <br /> to the modern health network.</h2>
+              <p className="text-xl text-zinc-400 max-w-2xl mx-auto font-medium">Ready to join the AyushAlert network?</p>
               <div className="pt-6">
                  <Link href="/dashboard" className="h-16 inline-flex items-center justify-center px-12 bg-white text-zinc-950 hover:bg-zinc-100 rounded-2xl text-lg font-bold transition-transform hover:scale-[1.02] shadow-xl">
                     Get Started with Demo
@@ -279,22 +274,22 @@ export default function LandingPage() {
         <section className="py-32 px-6 md:px-12 border-t border-zinc-100 dark:border-zinc-800/60 bg-white dark:bg-[#0B0F14]">
            <div className="max-w-7xl mx-auto space-y-20">
               <div className="max-w-2xl space-y-4">
-                 <h2 className="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tighter uppercase">Institutional Sovereignty</h2>
-                 <p className="text-lg text-zinc-500 font-medium">Foundational architecture enabling secure data exchange across multiple sources.</p>
+                 <h2 className="text-4xl md:text-5xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tighter uppercase">Secure Healthcare</h2>
+                 <p className="text-lg text-zinc-500 font-medium">Built with security and privacy to keep your health data safe.</p>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                  <TrustCard 
-                   icon={ShieldCheck} title="Governance Layer" 
-                   desc="Consent-based access control between all stakeholders." 
+                   icon={ShieldCheck} title="Privacy Control" 
+                   desc="You decide who can access your medical records." 
                  />
                  <TrustCard 
-                   icon={Zap} title="Unified Records" 
-                   desc="Integrated longitudinal health records from PHR to Hospitals." 
+                   icon={Zap} title="Patient History" 
+                   desc="All your prescriptions and reports in one secure place." 
                  />
                  <TrustCard 
-                   icon={Globe} title="Health Intelligence" 
-                   desc="Early detection of disease patterns at a population level." 
+                   icon={Globe} title="Health Trends" 
+                   desc="Helping communities stay safe with real-time health data." 
                  />
               </div>
            </div>
@@ -308,11 +303,11 @@ export default function LandingPage() {
                 whileHover={{ scale: 1.05 }}
               >
                 <div className="w-2 h-2 rounded-full bg-brand animate-pulse" />
-                <span className="text-[10px] font-black text-brand uppercase tracking-[0.3em]">Infrastructure Layer</span>
+                <span className="text-[10px] font-black text-brand uppercase tracking-[0.3em]">Secure Platform</span>
               </motion.div>
               <h2 className="text-5xl md:text-7xl font-bold text-zinc-900 dark:text-zinc-100 tracking-tight leading-[0.9]">
-                We are not building a feature. <br /> 
-                We are building the <span className="text-brand">healthcare data infrastructure platform.</span>
+                We are building more than a feature. <br /> 
+                We are building the <span className="text-brand">healthcare network for everyone.</span>
               </h2>
            </div>
         </section>
@@ -405,7 +400,7 @@ function ModuleCard({ icon: Icon, title, desc, tags, image }: any) {
                <p className="text-lg text-zinc-400 font-medium leading-relaxed">{desc}</p>
             </div>
             <div className="pt-4 flex items-center gap-2 text-brand font-bold text-sm tracking-tight group-hover:translate-x-2 transition-transform">
-               Explore Deployment <ChevronRight size={18} />
+               Learn More <ChevronRight size={18} />
             </div>
          </div>
       </div>
@@ -456,13 +451,13 @@ function Sparkline({ color }: { color: string }) {
 
 function AutoScrollFeed() {
   const logs = [
-    "PROTOCOL-NODE-4: SYNCING...",
-    "FHIR-RECORDS: 142 UPDATED",
-    "REGIONAL-SURVEILLANCE: SCANNING",
-    "NODE-772: CLUSTER DETECTED",
-    "DECENTRALIZED-HASH: VERIFIED",
-    "INSTITUTIONAL-HANDSHAKE: OK",
-    "SURVEILLANCE-RT: LIVE",
+    "Connecting to hospital...",
+    "142 Records updated...",
+    "Checking local trends...",
+    "Health trend detected...",
+    "Data verified...",
+    "Hospital connected...",
+    "Live updates active",
   ];
 
   return (

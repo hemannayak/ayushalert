@@ -136,7 +136,7 @@ export default function DoctorRegister() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col relative overflow-hidden">
+    <div className="min-h-screen bg-zinc-950 flex flex-col relative">
       {/* ── BACKGROUND MESH LAYER ────────────────────────────────────────── */}
       <div className="absolute inset-0 opacity-[0.4] pointer-events-none select-none z-0">
         <div className="absolute top-1/4 -right-1/4 w-[800px] h-[800px] bg-emerald-500/10 rounded-full blur-[160px]" />
@@ -203,7 +203,7 @@ export default function DoctorRegister() {
             <motion.div 
                initial={{ opacity: 0, y: 20 }}
                animate={{ opacity: 1, y: 0 }}
-               className="bg-zinc-900/40 backdrop-blur-3xl p-8 md:p-10 border border-white/5 rounded-[40px] shadow-2xl relative overflow-hidden"
+               className="bg-zinc-900/40 backdrop-blur-3xl p-8 md:p-10 border border-white/5 rounded-[40px] shadow-2xl relative"
             >
               <div className="absolute top-0 left-0 w-full h-1 bg-emerald-500/20" />
               
