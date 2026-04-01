@@ -63,7 +63,7 @@ export default function Dashboard() {
   const handleLogout = () => { localStorage.removeItem('token'); router.push('/patient/login'); };
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col relative text-white font-sans overflow-x-hidden">
+    <div className="dark min-h-screen bg-zinc-950 flex flex-col relative text-white font-sans overflow-x-hidden">
       {/* ── BACKGROUND ────────────────────────────────────────────────── */}
       <div className="fixed inset-0 opacity-[0.25] pointer-events-none z-0">
         <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-emerald-600/10 rounded-full blur-[140px]" />

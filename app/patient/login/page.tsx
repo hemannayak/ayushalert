@@ -197,7 +197,7 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col lg:flex-row relative overflow-hidden">
+    <div className="dark min-h-screen bg-zinc-950 flex flex-col lg:flex-row relative overflow-hidden">
       {/* ── BACKGROUND MESH LAYER ────────────────────────────────────────── */}
       <div className="absolute inset-0 opacity-[0.4] pointer-events-none select-none z-0">
         <div className="absolute top-1/4 -right-1/4 w-[800px] h-[800px] bg-cyan-500/10 rounded-full blur-[160px]" />

@@ -70,7 +70,7 @@ export default function HospitalLoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6 relative overflow-hidden text-white font-sans">
+    <div className="dark min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6 relative overflow-hidden text-white font-sans">
       <div className="absolute inset-0 opacity-[0.25] pointer-events-none z-0">
         <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-indigo-600/10 rounded-full blur-[140px]" />
         <div className="absolute bottom-0 left-0 w-[1000px] h-[1000px] bg-violet-600/5 rounded-full blur-[140px]" />

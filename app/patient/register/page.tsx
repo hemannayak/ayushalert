@@ -142,7 +142,7 @@ export default function Register() {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col relative">
+    <div className="dark min-h-screen bg-zinc-950 flex flex-col relative">
       {/* ── BACKGROUND MESH LAYER ────────────────────────────────────────── */}
       <div className="absolute inset-0 opacity-[0.4] pointer-events-none select-none z-0">
         <div className="absolute top-1/4 -right-1/4 w-[800px] h-[800px] bg-indigo-500/10 rounded-full blur-[160px]" />

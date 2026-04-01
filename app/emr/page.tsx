@@ -188,7 +188,7 @@ export default function EMRDashboard() {
   if (!authenticated) return null;
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col relative overflow-hidden">
+    <div className="dark min-h-screen bg-zinc-950 flex flex-col relative overflow-hidden">
       {/* ── MESH BACKGROUND ─────────────────────────────────────────────── */}
       <div className="absolute inset-0 opacity-[0.25] pointer-events-none z-0">
         <div className="absolute top-0 right-0 w-[1000px] h-[1000px] bg-indigo-600/10 rounded-full blur-[160px]" />

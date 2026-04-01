@@ -158,7 +158,7 @@ export default function HospitalAdminPortal() {
 
   if (authStep === 'enter') {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6 lg:p-24 relative overflow-hidden">
+      <div className="dark min-h-screen bg-zinc-950 flex flex-col items-center justify-center p-6 lg:p-24 relative overflow-hidden">
         <div className="absolute inset-0 opacity-[0.3] pointer-events-none select-none z-0">
           <div className="absolute top-1/2 -left-1/4 w-[800px] h-[800px] bg-indigo-600/10 rounded-full blur-[160px]" />
           <div className="absolute bottom-1/2 -right-1/4 w-[800px] h-[800px] bg-violet-600/10 rounded-full blur-[160px]" />
@@ -222,7 +222,7 @@ export default function HospitalAdminPortal() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col md:flex-row relative overflow-hidden">
+    <div className="dark min-h-screen bg-zinc-950 flex flex-col md:flex-row relative overflow-hidden">
       <AnimatePresence>
         {showModal && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
