@@ -53,6 +53,10 @@ export async function POST(req) {
         dosage:    rec.dosage    || [],
         symptoms:  rec.symptoms  || [],
         diagnosis: rec.diagnosis || [],
+        temp:      rec.temp      || null,
+        bp:        rec.bp        || null,
+        pulse:     rec.pulse     || null,
+        spo2:      rec.spo2      || null,
         doctor:    rec.doctor    || hospital.name,
         date:      rec.date      || new Date().toISOString().split('T')[0],
       };

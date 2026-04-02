@@ -11,7 +11,7 @@ interface Medicine { name: string; dosage: string; instructions: string; }
 
 // ── A4 PREVIEW MODAL ────────────────────────────────────────────────────────
 function A4Preview({ 
-  open, onClose, onPrint, patientId, patientEmail, doctorName, hospitalName, docType, symptoms, diagnosis, medicines, dosage, logoUrl 
+  open, onClose, onPrint, patientId, patientEmail, patientName, doctorName, hospitalName, docType, symptoms, diagnosis, medicines, dosage, logoUrl, temp, bp, pulse, spo2 
 }: any) {
   if (!open) return null;
   const parseCSV = (s: string) => s.split(',').map(x=>x.trim()).filter(Boolean);
@@ -50,8 +50,8 @@ function A4Preview({
 
             <div className="grid grid-cols-3 gap-6 bg-zinc-50 border border-zinc-100 p-6 rounded-xl mb-10">
                <div className="space-y-1">
-                  <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Patient ID</p>
-                  <p className="text-xs font-black font-mono">{patientId || '—'}</p>
+                  <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Patient Name & ID</p>
+                  <p className="text-xs font-black font-mono">{patientName || '—'} <span className="text-zinc-500 font-normal">({patientId || '—'})</span></p>
                </div>
                <div className="space-y-1">
                   <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Identity email</p>
@@ -68,8 +68,14 @@ function A4Preview({
                   <div className="flex items-center gap-4"><div className="flex-1 h-px bg-zinc-100" /><p className="text-[10px] font-black text-zinc-400 uppercase tracking-widest">Clinical Observations</p><div className="flex-1 h-px bg-zinc-100" /></div>
                   <div className="grid grid-cols-2 gap-8">
                      <div className="space-y-2">
-                        <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Presenting Symptoms</p>
-                        <div className="flex flex-wrap gap-2">{parseCSV(symptoms).map((s,i)=><span key={i} className="px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-[11px] font-bold text-indigo-600">{s}</span>)}</div>
+                        <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Presenting Symptoms & Vitals</p>
+                        <div className="flex flex-wrap gap-2">
+                           {temp && <span className="px-3 py-1 rounded-full bg-rose-50 border border-rose-100 text-[11px] font-bold text-rose-600">Temp: {temp}</span>}
+                           {bp && <span className="px-3 py-1 rounded-full bg-rose-50 border border-rose-100 text-[11px] font-bold text-rose-600">BP: {bp}</span>}
+                           {pulse && <span className="px-3 py-1 rounded-full bg-rose-50 border border-rose-100 text-[11px] font-bold text-rose-600">Pulse: {pulse}</span>}
+                           {spo2 && <span className="px-3 py-1 rounded-full bg-rose-50 border border-rose-100 text-[11px] font-bold text-rose-600">SpO2: {spo2}</span>}
+                           {parseCSV(symptoms).map((s,i)=><span key={i} className="px-3 py-1 rounded-full bg-indigo-50 border border-indigo-100 text-[11px] font-bold text-indigo-600">{s}</span>)}
+                        </div>
                      </div>
                      <div className="space-y-2">
                         <p className="text-[9px] font-black text-zinc-400 uppercase tracking-widest">Primary Diagnosis</p>
@@ -114,6 +120,7 @@ export default function EMRDashboard() {
   const router = useRouter();
   const [patientId, setPatientId] = useState('');
   const [patientEmail, setPatientEmail] = useState('');
+  const [patientName, setPatientName] = useState('');
   const [doctorName, setDoctorName] = useState('Dr. Smith (Attending)');
   const [hospitalName, setHospitalName] = useState('Apollo Hospital');
   const [docType, setDocType] = useState('Prescription');
@@ -121,6 +128,10 @@ export default function EMRDashboard() {
   const [symptoms, setSymptoms] = useState('');
   const [medicines, setMedicines] = useState('');
   const [dosage, setDosage] = useState('');
+  const [temp, setTemp] = useState('');
+  const [bp, setBp] = useState('');
+  const [pulse, setPulse] = useState('');
+  const [spo2, setSpo2] = useState('');
   const [billingAmount, setBillingAmount] = useState('500');
   const [showPreview, setShowPreview] = useState(false);
   const [logoUrl, setLogoUrl] = useState('');
@@ -131,6 +142,8 @@ export default function EMRDashboard() {
   
   const [drawerOpen, setDrawerOpen] = useState(false);
 
+  const FREQUENT_MEDS = ['Paracetamol 500mg', 'Amoxicillin 500mg', 'Cetirizine 10mg', 'Pantoprazole 40mg', 'Azithromycin 500mg', 'Metformin 500mg'];
+
   useEffect(() => {
     const hospitalToken = sessionStorage.getItem('portal_api_key');
     const doctorToken = localStorage.getItem('doctor_token');
@@ -138,6 +151,9 @@ export default function EMRDashboard() {
     // Auto-Sync Logged-in Hospital Identity
     const storedHospName = sessionStorage.getItem('hospital_name') || localStorage.getItem('hospital_name');
     if (storedHospName) setHospitalName(storedHospName);
+    
+    const storedLogo = sessionStorage.getItem('hospital_logo_url') || localStorage.getItem('hospital_logo_url');
+    if (storedLogo) setLogoUrl(storedLogo);
     
     if (!hospitalToken && !doctorToken) {
       router.push('/emr/login');
@@ -156,7 +172,7 @@ export default function EMRDashboard() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
-    if (!patientId && !patientEmail) { setError('Patient identifier required.'); return; }
+    if (!patientId && !patientEmail && !patientName) { setError('Patient identifier or name required.'); return; }
     if (!diagnosis && !symptoms && !medicines) { setError('Clinical parameters required.'); return; }
     setLoading(true); setError(''); setSuccess('');
     try {
@@ -167,10 +183,15 @@ export default function EMRDashboard() {
         body: JSON.stringify({ 
           abha_id: patientId, 
           patient_email: patientEmail, 
+          patient_name: patientName,
           billing_amount: parseFloat(billingAmount) || 0,
           records: [{ 
             diagnosis: diagnosis.split(','), 
             symptoms: symptoms.split(','), 
+            temp,
+            bp,
+            pulse,
+            spo2,
             medicines: medicines.split(','), 
             dosage: dosage.split(','), 
             doctor: `${doctorName} — ${hospitalName}`, 
@@ -180,7 +201,7 @@ export default function EMRDashboard() {
       });
       if (!res.ok) throw new Error('Ingestion failed');
       setSuccess('Record Saved Successfully');
-      setDiagnosis(''); setSymptoms(''); setMedicines(''); setDosage('');
+      setDiagnosis(''); setSymptoms(''); setMedicines(''); setDosage(''); setTemp(''); setBp(''); setPulse(''); setSpo2('');
     } catch (err: any) { setError(err.message); }
     finally { setLoading(false); }
   };
@@ -196,7 +217,7 @@ export default function EMRDashboard() {
         <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(circle at 2px 2px, rgba(255,255,255,0.02) 1px, transparent 0)', backgroundSize: '40px 40px' }} />
       </div>
 
-      <A4Preview open={showPreview} onClose={()=>setShowPreview(false)} onPrint={()=>window.print()} patientId={patientId} patientEmail={patientEmail} doctorName={doctorName} hospitalName={hospitalName} docType={docType} symptoms={symptoms} diagnosis={diagnosis} medicines={medicines} dosage={dosage} logoUrl={logoUrl} />
+      <A4Preview open={showPreview} onClose={()=>setShowPreview(false)} onPrint={()=>window.print()} patientId={patientId} patientEmail={patientEmail} patientName={patientName} doctorName={doctorName} hospitalName={hospitalName} docType={docType} symptoms={symptoms} diagnosis={diagnosis} medicines={medicines} dosage={dosage} logoUrl={logoUrl} temp={temp} bp={bp} pulse={pulse} spo2={spo2} />
 
       {/* PHASE 2: INTELLIGENCE DRAWER (SIDEBAR) */}
       <AnimatePresence>
@@ -291,6 +312,8 @@ export default function EMRDashboard() {
                <div className="space-y-4">
                   <div className="space-y-2"><label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest px-1">Patient ID (ABHA)</label><input type="text" value={patientId} onChange={e=>setPatientId(e.target.value)} placeholder="12-3456-7890-1234" className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-4 text-white font-mono text-sm outline-none focus:ring-2 focus:ring-indigo-500/40 transition" /></div>
                   <div className="flex items-center gap-4"><div className="flex-1 h-px bg-white/5" /><span className="text-[9px] font-black text-zinc-800 uppercase">Or</span><div className="flex-1 h-px bg-white/5" /></div>
+                  <div className="space-y-2"><label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest px-1">Patient Name</label><input type="text" value={patientName} onChange={e=>setPatientName(e.target.value)} placeholder="Full Name" className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:ring-2 focus:ring-indigo-500/40 transition" /></div>
+                  <div className="flex items-center gap-4"><div className="flex-1 h-px bg-white/5" /><span className="text-[9px] font-black text-zinc-800 uppercase">Or</span><div className="flex-1 h-px bg-white/5" /></div>
                   <div className="space-y-2"><label className="text-[10px] font-black text-zinc-600 uppercase tracking-widest px-1">Patient Email</label><input type="email" value={patientEmail} onChange={e=>setPatientEmail(e.target.value)} placeholder="patient@email.com" className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-4 text-white text-sm outline-none focus:ring-2 focus:ring-indigo-500/40 transition" /></div>
                </div>
             </div>
@@ -316,7 +339,7 @@ export default function EMRDashboard() {
                <div className="bg-white/5 p-8 border-b border-white/5 flex items-center justify-between">
                   <div className="flex items-center gap-3">
                      <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-400 border border-indigo-500/20"><Stethoscope size={20} /></div>
-                     <div><h2 className="text-sm font-black text-white uppercase tracking-widest">Patient Record</h2><p className="text-[10px] text-zinc-600 font-mono uppercase tracking-[0.2em]">Verified Secure Session</p></div>
+                     <div><h2 className="text-sm font-black text-white uppercase tracking-widest">Write Prescription</h2><p className="text-[10px] text-zinc-600 font-mono uppercase tracking-[0.2em]">Verified Secure Session</p></div>
                   </div>
                   <div className="flex items-center gap-4 text-right hidden sm:flex">
                      <div className="space-y-0.5"><p className="text-[8px] font-black text-zinc-600 uppercase tracking-widest">Doctor Name</p><input value={doctorName} onChange={e=>setDoctorName(e.target.value)} className="bg-transparent text-[11px] font-black text-zinc-300 text-right uppercase border-none focus:ring-0 w-36 outline-none" /></div>
@@ -343,12 +366,23 @@ export default function EMRDashboard() {
                   </div>
 
                   <div className="space-y-8">
-                     <div className="space-y-3">
-                        <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1 flex items-center justify-between">
-                           <span>Patient Symptoms <span className="font-mono text-zinc-700 font-bold ml-1">(Separate with commas)</span></span>
-                           {symptoms.toLowerCase().includes('fever') && <span className="text-[8px] tracking-widest text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse"><AlertCircle size={10}/> Outbreak Risk Detected</span>}
-                        </label>
-                        <input value={symptoms} onChange={e=>setSymptoms(e.target.value)} placeholder="Fever, Dry Cough, Acute fatigue..." className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-6 py-5 text-sm font-bold text-white placeholder-zinc-800 outline-none focus:ring-2 focus:ring-indigo-500/30 transition shadow-inner" />
+                     <div className="grid md:grid-cols-2 gap-8">
+                        <div className="space-y-3">
+                           <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1 flex items-center justify-between">
+                              <span>Patient Symptoms <span className="font-mono text-zinc-700 font-bold ml-1">(Separate with commas)</span></span>
+                              {symptoms.toLowerCase().includes('fever') && <span className="text-[8px] tracking-widest text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full flex items-center gap-1 animate-pulse"><AlertCircle size={10}/> Outbreak Risk Detected</span>}
+                           </label>
+                           <input value={symptoms} onChange={e=>setSymptoms(e.target.value)} placeholder="Fever, Dry Cough, Acute fatigue..." className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-6 py-5 text-sm font-bold text-white placeholder-zinc-800 outline-none focus:ring-2 focus:ring-indigo-500/30 transition shadow-inner" />
+                        </div>
+                        <div className="space-y-3">
+                           <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Patient Vitals</label>
+                           <div className="grid grid-cols-2 gap-4">
+                              <input value={temp} onChange={e=>setTemp(e.target.value)} placeholder="Temp (e.g., 98.6°F)" className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-5 text-sm font-bold text-white placeholder-zinc-800 outline-none focus:ring-2 focus:ring-indigo-500/30 transition shadow-inner" />
+                              <input value={bp} onChange={e=>setBp(e.target.value)} placeholder="BP (e.g., 120/80)" className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-5 text-sm font-bold text-white placeholder-zinc-800 outline-none focus:ring-2 focus:ring-indigo-500/30 transition shadow-inner" />
+                              <input value={pulse} onChange={e=>setPulse(e.target.value)} placeholder="Pulse Rate" className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-5 text-sm font-bold text-white placeholder-zinc-800 outline-none focus:ring-2 focus:ring-indigo-500/30 transition shadow-inner" />
+                              <input value={spo2} onChange={e=>setSpo2(e.target.value)} placeholder="SpO2 (%)" className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-5 text-sm font-bold text-white placeholder-zinc-800 outline-none focus:ring-2 focus:ring-indigo-500/30 transition shadow-inner" />
+                           </div>
+                        </div>
                      </div>
                      <div className="space-y-3">
                         <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Clinical Diagnosis <span className="font-mono text-zinc-800 font-bold ml-1">(REQUIRED)</span></label>
@@ -361,6 +395,24 @@ export default function EMRDashboard() {
                               {medicines.length > 2 && <span className="text-[8px] tracking-widest text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full flex items-center gap-1"><Shield size={10}/> Network Sync Active</span>}
                            </label>
                            <textarea value={medicines} onChange={e=>setMedicines(e.target.value)} placeholder="Drug Name / Salt (Separate with commas)..." rows={4} className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-4 text-xs font-bold text-zinc-300 placeholder-zinc-800 outline-none resize-none focus:border-indigo-500/30 transition shadow-inner" />
+                           
+                           <div className="space-y-2 mt-4 pt-4 border-t border-white/5">
+                              <label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Frequently Prescribed Medicines</label>
+                              <select 
+                                 onChange={e => {
+                                    if(e.target.value) {
+                                       setMedicines(prev => prev ? `${prev}, ${e.target.value}` : e.target.value);
+                                       e.target.value = "";
+                                    }
+                                 }}
+                                 className="w-full bg-indigo-500/5 hover:bg-indigo-500/10 border border-indigo-500/20 rounded-xl px-4 py-3 text-xs font-bold text-indigo-400 outline-none transition cursor-pointer appearance-none"
+                              >
+                                 <option value="">+ Select Medicine from Dropdown...</option>
+                                 {FREQUENT_MEDS.map(med => (
+                                    <option key={med} value={med}>{med}</option>
+                                 ))}
+                              </select>
+                           </div>
                         </div>
                         <div className="space-y-3"><label className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] px-1">Dosage Frequency Instructions</label><textarea value={dosage} onChange={e=>setDosage(e.target.value)} placeholder="Dosage (CSV matched to medicines)..." rows={4} className="w-full bg-zinc-950/50 border border-zinc-800 rounded-2xl px-5 py-4 text-xs font-bold text-zinc-300 placeholder-zinc-800 outline-none resize-none focus:border-indigo-500/30 transition shadow-inner" /></div>
                      </div>
