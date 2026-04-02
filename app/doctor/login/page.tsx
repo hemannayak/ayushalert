@@ -51,14 +51,20 @@ export default function DoctorLogin() {
       setError("Please enter your Doctor ID first before scanning.");
       return;
     }
+    setError('');
+    setLoading(true); // Temporarily true to prevent multiple clicks while requesting permission
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
+        videoRef.current.play().catch(e => console.error("Video play error:", e));
         setCameraActive(true);
       }
     } catch (err) {
+        console.error("Camera error:", err)
         setError("Unable to access camera permissions.");
+    } finally {
+        setLoading(false);
     }
   };
 
@@ -97,6 +103,7 @@ export default function DoctorLogin() {
                           captureAndLogin(Array.from(finalDetection.descriptor));
                       } else {
                           setError("Face lost during capture. Please try again.");
+                          setLoading(false);
                       }
                   }
               }, 1000);
@@ -344,12 +351,22 @@ export default function DoctorLogin() {
                     )}
                     
                     {modelsLoaded && !cameraActive && (
-                      <button 
-                        onClick={startCamera} 
-                        className="h-16 w-16 rounded-full bg-cyan-500 text-zinc-950 flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-[0_0_30px_rgba(34,211,238,0.4)]"
-                      >
-                        <Fingerprint size={32} />
-                      </button>
+                      <div className="flex flex-col items-center gap-4 relative z-10 w-full px-6">
+                        {!doctorId.trim() ? (
+                           <div className="flex flex-col items-center gap-3">
+                              <Lock className="text-zinc-600" size={32} />
+                              <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 text-center">Enter your Doctor ID above<br/>to unlock scanner</p>
+                           </div>
+                        ) : (
+                           <button 
+                             onClick={startCamera} 
+                             disabled={loading}
+                             className="h-16 w-16 rounded-full bg-cyan-500 text-zinc-950 flex items-center justify-center transition-all hover:scale-110 active:scale-95 shadow-[0_0_30px_rgba(34,211,238,0.4)] disabled:opacity-50"
+                           >
+                             <Fingerprint size={32} />
+                           </button>
+                        )}
+                      </div>
                     )}
 
                     <video 
