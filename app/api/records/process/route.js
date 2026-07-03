@@ -145,23 +145,38 @@ async function visionAPI(imageUrl) {
   if (!apiKey) throw new Error('GEMINI_API_KEY is missing.');
 
   try {
-    // Force Cloudinary to dynamically rasterize PDFs to JPGs to prevent Gemini inline_data hanging
-    let urlToProcess = imageUrl;
-    if (urlToProcess.toLowerCase().endsWith('.pdf')) {
-        urlToProcess = urlToProcess.replace(/\.pdf$/i, '.jpg');
+    let buffer;
+    let contentType = 'image/jpeg';
+    const lowerUrl = imageUrl.toLowerCase();
+
+    // Check if it is a local path (starts with /) or remote URL
+    if (imageUrl.startsWith('/')) {
+      const fs = require('fs');
+      const path = require('path');
+      const filePath = path.join(process.cwd(), 'public', imageUrl);
+      if (!fs.existsSync(filePath)) {
+        throw new Error(`Local file not found: ${filePath}`);
+      }
+      buffer = fs.readFileSync(filePath);
+      if (lowerUrl.endsWith('.pdf')) contentType = 'application/pdf';
+      else if (lowerUrl.endsWith('.png')) contentType = 'image/png';
+      else if (lowerUrl.endsWith('.webp')) contentType = 'image/webp';
+    } else {
+      // Force Cloudinary to dynamically rasterize PDFs to JPGs to prevent Gemini inline_data hanging
+      let urlToProcess = imageUrl;
+      if (urlToProcess.toLowerCase().endsWith('.pdf')) {
+          urlToProcess = urlToProcess.replace(/\.pdf$/i, '.jpg');
+      }
+
+      const imgRes = await fetch(urlToProcess);
+      buffer = await imgRes.arrayBuffer();
+
+      if (lowerUrl.includes('.pdf')) contentType = 'application/pdf';
+      if (lowerUrl.includes('.png')) contentType = 'image/png';
+      if (lowerUrl.includes('.webp')) contentType = 'image/webp';
+      if (lowerUrl.includes('.heic') || lowerUrl.includes('.heif')) contentType = 'image/heic';
     }
 
-    const imgRes = await fetch(urlToProcess);
-    
-    // Strictly map extension to exact MIME type so Gemini's inline_data validation doesn't crash
-    const lowerUrl = urlToProcess.toLowerCase();
-    let contentType = 'image/jpeg';
-    if (lowerUrl.includes('.pdf')) contentType = 'application/pdf';
-    if (lowerUrl.includes('.png')) contentType = 'image/png';
-    if (lowerUrl.includes('.webp')) contentType = 'image/webp';
-    if (lowerUrl.includes('.heic') || lowerUrl.includes('.heif')) contentType = 'image/heic';
-
-    const buffer = await imgRes.arrayBuffer();
     const base64Data = Buffer.from(buffer).toString('base64');
 
     const prompt = `
@@ -194,7 +209,7 @@ async function visionAPI(imageUrl) {
         contents: [{
           parts: [
             { text: prompt },
-            { inline_data: { mime_type: contentType, data: base64Data } }
+            { inlineData: { mimeType: contentType, data: base64Data } }
           ]
         }]
       }),

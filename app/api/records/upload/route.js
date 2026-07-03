@@ -60,7 +60,25 @@ export async function POST(req) {
        uploadOptions.format = 'pdf';
     }
 
-    const uploadResponse = await cloudinary.uploader.upload(dataURI, uploadOptions);
+    let file_url = '';
+
+    if (!process.env.CLOUDINARY_CLOUD_NAME || !process.env.CLOUDINARY_API_KEY || !process.env.CLOUDINARY_API_SECRET) {
+      console.warn('[Upload] Cloudinary credentials not configured. Falling back to local filesystem storage in public/uploads.');
+      const fs = require('fs');
+      const path = require('path');
+      const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      const filename = `${Date.now()}-${file.name}`;
+      const filePath = path.join(uploadDir, filename);
+      const buffer = Buffer.from(fileBuffer);
+      fs.writeFileSync(filePath, buffer);
+      file_url = `/uploads/${filename}`;
+    } else {
+      const uploadResponse = await cloudinary.uploader.upload(dataURI, uploadOptions);
+      file_url = uploadResponse.secure_url;
+    }
 
     const record_id = `REC_${Date.now()}`;
 
@@ -70,7 +88,7 @@ export async function POST(req) {
       record_id,
       patient_id,
       file_name: file.name,
-      file_url: uploadResponse.secure_url,
+      file_url,
       ocr_status: 'pending',
       fhir_status: 'pending',
       document_type,
@@ -85,7 +103,7 @@ export async function POST(req) {
     return NextResponse.json({
       message: 'Medical record uploaded successfully',
       record_id,
-      file_url: uploadResponse.secure_url
+      file_url
     }, { status: 201 });
 
   } catch (error) {

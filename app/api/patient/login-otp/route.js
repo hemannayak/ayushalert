@@ -37,22 +37,31 @@ export async function POST(req) {
     await patient.save();
 
     // Send email
-    await transporter.sendMail({
-      from: process.env.SMTP_EMAIL,
-      to: patient.email,
-      subject: 'AyushAlert - Your Login OTP',
-      html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
-          <h2 style="color: #2563eb;">AyushAlert Login Verification</h2>
-          <p>Hello <b>${patient.name}</b>,</p>
-          <p>You requested to log in using an OTP. Please use the verification code below:</p>
-          <div style="background: #f3f4f6; padding: 15px; text-align: center; border-radius: 5px; font-size: 24px; font-weight: bold; letter-spacing: 5px; color: #1f2937;">
-            ${otp}
+    try {
+      if (!process.env.SMTP_EMAIL || !process.env.SMTP_PASSWORD) {
+        throw new Error('SMTP credentials not configured in environment.');
+      }
+      await transporter.sendMail({
+        from: process.env.SMTP_EMAIL,
+        to: patient.email,
+        subject: 'AyushAlert - Your Login OTP',
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: auto; border: 1px solid #ddd; padding: 20px; border-radius: 10px;">
+            <h2 style="color: #2563eb;">AyushAlert Login Verification</h2>
+            <p>Hello <b>${patient.name}</b>,</p>
+            <p>You requested to log in using an OTP. Please use the verification code below:</p>
+            <div style="background: #f3f4f6; padding: 15px; text-align: center; border-radius: 5px; font-size: 24px; font-weight: bold; letter-spacing: 5px; color: #1f2937;">
+              ${otp}
+            </div>
+            <p style="color: #6b7280; font-size: 14px; mt-4">This OTP is valid for 10 minutes. Do not share it with anyone.</p>
           </div>
-          <p style="color: #6b7280; font-size: 14px; mt-4">This OTP is valid for 10 minutes. Do not share it with anyone.</p>
-        </div>
-      `
-    });
+        `
+      });
+      console.log(`[SMTP] Login OTP sent successfully to ${patient.email}`);
+    } catch (mailErr) {
+      console.warn(`[WARNING] Failed to send login OTP to ${patient.email} via SMTP:`, mailErr.message);
+      console.log(`\n========================================\n[DEVELOPMENT] Patient OTP for ID ${patient_id} is: ${otp}\n========================================\n`);
+    }
 
     return NextResponse.json({ message: 'OTP sent successfully' }, { status: 200 });
 
